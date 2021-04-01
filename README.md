@@ -19,6 +19,15 @@ API Gateway voor de communicatie tussen frontend en backend. Zorgt voor web frie
 
 ## Getting started
 
+### Run with Docker
+```zsh
+docker-compose build
+docker-compose up
+```
+
+#### Note
+Make sure that you are in the directory of `docker-compose.yml` when running these commands.
+
 ## Bijdragen?
 Op dit moment wordt dit project onwikkeld door G4-IPost groep. Mocht je interesse hebben om mee te helpen kun je dit laten weten aan een van de ontwikkelaars.
 
