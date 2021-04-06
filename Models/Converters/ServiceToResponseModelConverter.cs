@@ -1,0 +1,71 @@
+﻿using api_gateway.Models.ResponseModels;
+using api_gateway.Models.ServiceModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace api_gateway.Models.Converters
+{
+    /// <summary>
+    /// Transfers incoming objects from microservices into response objects for API endpoints
+    /// </summary>
+    public static class ServiceToResponseModelConverter
+    {
+        public static PackageResponseModel ConvertPackage(PackageServiceModel serviceModel)
+        {
+            return new PackageResponseModel(
+                serviceModel.Id,
+                serviceModel.ReceiverId,
+                serviceModel.TrackAndTraceId,
+                serviceModel.CollectionPointId,
+                serviceModel.Sender,
+                serviceModel.Name,
+                serviceModel.Status,
+                serviceModel.RouteFinished,
+                ConvertTickets(serviceModel.Tickets)
+                );
+        }
+
+        public static TicketResponseModel ConvertTicket(TicketServiceModel serviceModel)
+        {
+            return new TicketResponseModel(
+                serviceModel.Id,
+                serviceModel.ToDoLocationId,
+                serviceModel.CreatedAt,
+                serviceModel.CreatedByPCN,
+                serviceModel.FinishedAt,
+                serviceModel.FinishedByPCN,
+                serviceModel.IsFinished,
+                serviceModel.NextTicketId,
+                serviceModel.TicketAction
+                );
+        }
+
+        public static ICollection<TicketResponseModel> ConvertTickets(ICollection<TicketServiceModel> serviceModels)
+        {
+            List<TicketResponseModel> responseModels = new List<TicketResponseModel>();
+
+            foreach(var serviceModel in serviceModels)
+            {
+                TicketResponseModel responseModel = ConvertTicket(serviceModel);
+                responseModels.Add(responseModel);
+            }
+
+            return responseModels;
+        }
+
+        public static ICollection<PackageResponseModel> ConvertPackages(ICollection<PackageServiceModel> serviceModels)
+        {
+            List<PackageResponseModel> responseModels = new List<PackageResponseModel>();
+
+            foreach(var serviceModel in serviceModels)
+            {
+                PackageResponseModel responseModel = ConvertPackage(serviceModel);
+                responseModels.Add(responseModel);
+            }
+
+            return responseModels;
+        }
+    }
+}
