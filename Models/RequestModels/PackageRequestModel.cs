@@ -7,10 +7,10 @@ namespace api_gateway.Models.RequestModels
 {
     public class PackageRequestModel
     {
-        public int ReceiverId { get; }
-        public int CollectionPointId { get; }
-        public int TrackAndTraceId { get; }
-        public string Sender { get; }
-        public string Name { get; }
+        public int ReceiverId { get; set; }
+        public int CollectionPointId { get; set; }
+        public int TrackAndTraceId { get; set; }
+        public string Sender { get; set; }
+        public string Name { get; set; }
     }
 }

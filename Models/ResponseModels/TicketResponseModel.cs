@@ -8,15 +8,15 @@ namespace api_gateway.Models.ResponseModels
 {
     public class TicketResponseModel
     {
-        public Guid Id { get; }
-        public string ToDoLocationId { get; }
-        public DateTime CreatedAt { get; }
-        public string CreatedByPCN { get; }
-        public double FinishedAt { get; }
-        public string FinishedByPCN { get; }
-        public bool IsFinished { get; }
-        public string NextTicketId { get; }
-        public TicketAction TicketAction { get; }
+        public Guid Id { get; set; }
+        public string ToDoLocationId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string CreatedByPCN { get; set; }
+        public double FinishedAt { get; set; }
+        public string FinishedByPCN { get; set; }
+        public bool IsFinished { get; set; }
+        public string NextTicketId { get; set; }
+        public TicketAction TicketAction { get; set; }
 
         public TicketResponseModel(Guid id, string toDoLocationId, DateTime createdAt, string createdByPCN, double finishedAt, string finishedByPCN, bool isFinished, string nextTicketId, TicketAction ticketAction)
         {
@@ -29,6 +29,11 @@ namespace api_gateway.Models.ResponseModels
             IsFinished = isFinished;
             NextTicketId = nextTicketId;
             TicketAction = ticketAction;
+        }
+
+        public TicketResponseModel()
+        {
+
         }
     }
 }

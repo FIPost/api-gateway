@@ -46,6 +46,12 @@ namespace api_gateway.Models.Converters
         {
             List<TicketResponseModel> responseModels = new List<TicketResponseModel>();
 
+            // if the list is null assume empty and return an empty response model list
+            if(serviceModels == null)
+            {
+                return new List<TicketResponseModel>();
+            }
+
             foreach(var serviceModel in serviceModels)
             {
                 TicketResponseModel responseModel = ConvertTicket(serviceModel);
