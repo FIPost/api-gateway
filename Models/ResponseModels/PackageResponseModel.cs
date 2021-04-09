@@ -8,15 +8,15 @@ namespace api_gateway.Models.ResponseModels
 {
     public class PackageResponseModel
     {
-        public Guid Id { get; }
-        public string ReceiverId { get; }
-        public string TrackAndTraceId { get; }
-        public string CollectionPointId { get; }
-        public string Sender { get; }
-        public string Name { get; }
-        public Status Status { get; }
-        public bool RouteFinished { get; }
-        public virtual ICollection<TicketResponseModel> Tickets { get; }
+        public Guid Id { get; set; }
+        public string ReceiverId { get; set; }
+        public string TrackAndTraceId { get; set; }
+        public string CollectionPointId { get; set; }
+        public string Sender { get; set; }
+        public string Name { get; set; }
+        public Status Status { get; set; }
+        public bool RouteFinished { get; set; }
+        public virtual ICollection<TicketResponseModel> Tickets { get; set; }
 
         public PackageResponseModel(Guid id, string receiverId, string trackAndTraceId, string collectionPointId, string sender, string name, Status status, bool routeFinished, ICollection<TicketResponseModel> tickets)
         {
@@ -29,6 +29,11 @@ namespace api_gateway.Models.ResponseModels
             Status = status;
             RouteFinished = routeFinished;
             Tickets = tickets;
+        }
+
+        public PackageResponseModel()
+        {
+
         }
     }
 }
