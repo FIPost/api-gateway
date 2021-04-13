@@ -9,6 +9,7 @@ using Flurl.Http;
 using api_gateway.Models.Converters;
 using api_gateway.Models.RequestModels;
 using Microsoft.AspNetCore.Http;
+using api_gateway.Helper;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -40,7 +41,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<PackageResponseModel>>> Get()
         {
-            IFlurlResponse response = await $"http://pakketservice:5001/api/packages".GetAsync();
+            IFlurlResponse response = await $"{Constants.PackageApiUrl}/api/packages".GetAsync();
 
             if(response.StatusCode >= 500)
             {
@@ -75,7 +76,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PackageResponseModel>> GetById(Guid id)
         {
-            IFlurlResponse response = await $"http://pakketservice:5001/api/packages/{id}".GetAsync();
+            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".GetAsync();
 
             if(response.StatusCode == 404)
             {
@@ -111,7 +112,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PackageResponseModel>> Post(PackageRequestModel request)
         {
-            IFlurlResponse response = await $"http://pakketservice:5001/api/packages".PostJsonAsync(request);
+            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages".PostJsonAsync(request);
 
             if(response.StatusCode >= 500)
             {
@@ -147,7 +148,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Put(Guid id, PackageRequestModel request)
         {
-            IFlurlResponse response = await $"http://pakketservice:5001/api/packages/{id}".PutJsonAsync(request);
+            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".PutJsonAsync(request);
 
             if(response.StatusCode == 404)
             {
@@ -186,7 +187,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Delete(Guid id)
         {
-            IFlurlResponse response = await $"http://pakketservice:5001/api/packages/{id}".DeleteAsync();
+            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".DeleteAsync();
             if(response.StatusCode == 404)
             {
                 return NotFound();
