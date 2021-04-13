@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using api_gateway.Helper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,6 +28,9 @@ namespace api_gateway
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Constants.PackageApiUrl = Configuration.GetValue<string>("PackageApiUrl");
+            Constants.LocationApiUrl = Configuration.GetValue<string>("LocationApiUrl");
+
             services.AddControllers();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
