@@ -3,7 +3,7 @@ services:
     pkg:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile.local
         container_name: gateway
         ports:
             - "0.0.0.0:8123:8123"
