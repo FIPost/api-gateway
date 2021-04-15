@@ -188,6 +188,7 @@ namespace api_gateway.Controllers
         public async Task<ActionResult> Delete(Guid id)
         {
             IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".DeleteAsync();
+            
             if(response.StatusCode == 404)
             {
                 return NotFound();
