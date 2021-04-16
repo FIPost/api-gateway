@@ -14,11 +14,15 @@ jobs:
         with:
           dotnet-version: '3.1.x'
   
+      - name: Install dependencies
+        run: dotnet add package Newtonsoft.Json --version 12.0.1
+  
       - uses: microsoft/variable-substitution@v1 
         with:
             files: 'appsettings.json'
         env:
-            ConnectionString: ${{ secrets.DATABASE_CONNECTION }}
+            PackageApiUrl: "${{ secrets.PAKKET_URL }}"
+            LocationApiUrl: "${{ secrets.LOCATIE_URL }}"
           
       - name: Push to Docker Hub
         uses: docker/build-push-action@v1
