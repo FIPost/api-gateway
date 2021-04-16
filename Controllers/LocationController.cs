@@ -231,12 +231,12 @@ namespace api_gateway.Controllers
         /// <response code="201">A new room has been created</response>
         /// <response code="400">bad request, something went wrong on the client-side</response>
         /// <response code="500">processing error, something went wrong on the server-side</response>
-        [HttpPost]
+        [HttpPost("rooms")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Room>> PostRoom(RoomRequestModel request){
-            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/Room".PostJsonAsync(request);
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/Room".PostJsonAsync(request);
 
             if (response.StatusCode >= 500)
             {
@@ -261,13 +261,13 @@ namespace api_gateway.Controllers
         /// <response code="201">A new city has been created</response>
         /// <response code="400">bad request, something went wrong on the client-side</response>
         /// <response code="500">processing error, something went wrong on the server-side</response>
-        [HttpPost]
+        [HttpPost("cities")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<City>> PostCity(CityRequestModel request)
         {
-            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/City".PostJsonAsync(request);
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/City".PostJsonAsync(request);
 
             if (response.StatusCode >= 500)
             {
@@ -292,13 +292,13 @@ namespace api_gateway.Controllers
         /// <response code="201">A new building has been created</response>
         /// <response code="400">bad request, something went wrong on the client-side</response>
         /// <response code="500">processing error, something went wrong on the server-side</response>
-        [HttpPost]
+        [HttpPost("buildings")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Building>> PostBuilding(BuildingRequestModel request)
         {
-            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/Building".PostJsonAsync(request);
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/Building".PostJsonAsync(request);
 
             if (response.StatusCode >= 500)
             {
