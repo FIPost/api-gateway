@@ -1,4 +1,8 @@
 ![ipost-logo](https://github.com/FIPost/docs/blob/master/assets/logo-name.png?raw=true)
+
+[![Build .NET API](https://github.com/FIPost/api-gateway/actions/workflows/build.yml/badge.svg)](https://github.com/FIPost/api-gateway/actions/workflows/build.yml)
+[![Publish Docker image](https://github.com/FIPost/api-gateway/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/FIPost/api-gateway/actions/workflows/docker-publish.yml)
+
 # API Gateway
 <h3 align="middle">
   <a href="https://github.com/FIPost/docs">Documentation</a>
