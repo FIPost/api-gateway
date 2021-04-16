@@ -126,7 +126,7 @@ namespace api_gateway.Controllers
             {
                 PackageServiceModel model = await response.GetJsonAsync<PackageServiceModel>();
                 PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(model);
-                return CreatedAtAction("GetPackage", new { id = model.Id }, responseModel);
+                return CreatedAtAction("Post", responseModel);
             }
         }
 
