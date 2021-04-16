@@ -7,7 +7,6 @@ namespace api_gateway.Models.ServiceModels.Location
 {
     public class Address
     {
-        public Guid Id { get; set; }
         public City City { get; set; }
         public string PostalCode { get; set; }
         public string Street { get; set; }
