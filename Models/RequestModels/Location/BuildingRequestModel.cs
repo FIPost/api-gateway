@@ -9,6 +9,6 @@ namespace api_gateway.Models.RequestModels.Location
     public class BuildingRequestModel
     {
         public string Name { get; set; }
-        public Address Address { get; set; }
+        public AddressRequestModel Address { get; set; }
     }
 }
