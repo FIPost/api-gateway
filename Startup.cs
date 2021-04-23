@@ -30,6 +30,7 @@ namespace api_gateway
         {
             Constants.PackageApiUrl = Configuration.GetValue<string>("PackageApiUrl");
             Constants.LocationApiUrl = Configuration.GetValue<string>("LocationApiUrl");
+            Constants.PersonApiUrl = Configuration.GetValue<string>("PersonApiUrl");
 
             services.AddControllers();
 
