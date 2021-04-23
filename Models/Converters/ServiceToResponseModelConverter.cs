@@ -19,7 +19,22 @@ namespace api_gateway.Models.Converters
                 serviceModel.ReceiverId,
                 serviceModel.TrackAndTraceId,
                 serviceModel.CollectionPointId,
-                serviceModel.Sender,
+                new PersonServiceModel(),
+                serviceModel.Name,
+                serviceModel.Status,
+                serviceModel.RouteFinished,
+                ConvertTickets(serviceModel.Tickets)
+                );
+        }
+
+        public static PackageResponseModel ConvertPackage(PackageServiceModel serviceModel, PersonServiceModel personServiceModel)
+        {
+            return new PackageResponseModel(
+                serviceModel.Id,
+                serviceModel.ReceiverId,
+                serviceModel.TrackAndTraceId,
+                serviceModel.CollectionPointId,
+                personServiceModel,
                 serviceModel.Name,
                 serviceModel.Status,
                 serviceModel.RouteFinished,

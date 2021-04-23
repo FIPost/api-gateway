@@ -1,4 +1,5 @@
-﻿using api_gateway.Models.Shared;
+﻿using api_gateway.Models.ServiceModels;
+using api_gateway.Models.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace api_gateway.Models.ResponseModels
     public class PackageResponseModel
     {
         public Guid Id { get; set; }
-        public string ReceiverId { get; set; }
+        public PersonServiceModel Receiver { get; set; }
         public string TrackAndTraceId { get; set; }
         public string CollectionPointId { get; set; }
         public string Sender { get; set; }
@@ -18,10 +19,11 @@ namespace api_gateway.Models.ResponseModels
         public bool RouteFinished { get; set; }
         public virtual ICollection<TicketResponseModel> Tickets { get; set; }
 
-        public PackageResponseModel(Guid id, string receiverId, string trackAndTraceId, string collectionPointId, string sender, string name, Status status, bool routeFinished, ICollection<TicketResponseModel> tickets)
+        public PackageResponseModel(Guid id, string sender, string trackAndTraceId, string collectionPointId, PersonServiceModel receiver, string name,
+            Status status, bool routeFinished, ICollection<TicketResponseModel> tickets)
         {
             Id = id;
-            ReceiverId = receiverId;
+            Receiver = receiver;
             TrackAndTraceId = trackAndTraceId;
             CollectionPointId = collectionPointId;
             Sender = sender;
