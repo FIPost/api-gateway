@@ -16,7 +16,7 @@ namespace api_gateway.Models.Converters
         {
             return new PackageResponseModel(
                 serviceModel.Id,
-                serviceModel.ReceiverId,
+                serviceModel.Sender,
                 serviceModel.TrackAndTraceId,
                 serviceModel.CollectionPointId,
                 new PersonServiceModel(),
@@ -31,7 +31,7 @@ namespace api_gateway.Models.Converters
         {
             return new PackageResponseModel(
                 serviceModel.Id,
-                serviceModel.ReceiverId,
+                serviceModel.Sender,
                 serviceModel.TrackAndTraceId,
                 serviceModel.CollectionPointId,
                 personServiceModel,
