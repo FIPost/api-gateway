@@ -44,22 +44,39 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<PackageResponseModel>>> Get()
         {
-            IFlurlResponse response = await $"{Constants.PackageApiUrl}/api/packages".GetAsync();
+            IFlurlResponse packageResponse = await $"{Constants.PackageApiUrl}/api/packages".GetAsync();
+            var errPackageResponse = packageResponse.GetResponse();
 
-            if (response.StatusCode >= 500)
+            if (errPackageResponse.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
             }
-            else if (response.StatusCode >= 400)
+
+            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/room".GetAsync();
+            var errLocationResponse = locationResponse.GetResponse();
+
+            if (errLocationResponse.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(400);
+                return new ObjectResult(errLocationResponse.Message) { StatusCode = (int)errLocationResponse.StatusCode };
             }
-            else
+
+            IFlurlResponse personResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
+            var errPersonResponse = personResponse.GetResponse();
+
+            if (errPersonResponse.StatusCode != HttpStatusCode.OK)
             {
-                ICollection<PackageServiceModel> serviceModels = await response.GetJsonAsync<ICollection<PackageServiceModel>>();
-                ICollection<PackageResponseModel> responseModels = ServiceToResponseModelConverter.ConvertPackages(serviceModels);
-                return Ok(responseModels);
+                return new ObjectResult(errPersonResponse.Message) { StatusCode = (int)errPersonResponse.StatusCode };
             }
+
+            ICollection<PackageServiceModel> allPackageServiceModels = await packageResponse.GetJsonAsync<ICollection<PackageServiceModel>>();
+            ICollection<Room> allRooms = await locationResponse.GetJsonAsync<ICollection<Room>>();
+            ICollection<PersonServiceModel> allPersonServiceModels = await personResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
+
+            ICollection<PackageResponseModel> allPackages = ServiceToResponseModelConverter.ConvertPackages(allPackageServiceModels, allPersonServiceModels, allRooms);
+
+
+            return Ok(allPackages);
+
         }
 
 
@@ -87,26 +104,25 @@ namespace api_gateway.Controllers
             {
                 return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
             }
-
             PackageServiceModel packageModel = await packageResponse.GetJsonAsync<PackageServiceModel>();
+
             IFlurlResponse personResponse = await $"{ Constants.PersonApiUrl }/api/persons/{packageModel.ReceiverId}".GetAsync();
             var errPersonResponse = personResponse.GetResponse();
+            PersonServiceModel personModel = null;
 
-            if (errPersonResponse.StatusCode != HttpStatusCode.OK)
+            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
             {
-                return new ObjectResult(errPersonResponse.Message) { StatusCode = (int)errPersonResponse.StatusCode };
+                personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
             }
 
-            PersonServiceModel personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
             IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/room/{packageModel.CollectionPointId}".GetAsync();
             var errLocationResponse = locationResponse.GetResponse();
+            Room room = null;
 
-            if (errLocationResponse.StatusCode != HttpStatusCode.OK)
+            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
             {
-                return new ObjectResult(errLocationResponse.Message) { StatusCode = (int)errLocationResponse.StatusCode };
+                room = await locationResponse.GetJsonAsync<Room>();
             }
-
-            Room room = await locationResponse.GetJsonAsync<Room>();
 
             PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, personModel, room);
             return Ok(responseModel);

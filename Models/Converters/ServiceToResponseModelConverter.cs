@@ -77,13 +77,17 @@ namespace api_gateway.Models.Converters
             return responseModels;
         }
 
-        public static ICollection<PackageResponseModel> ConvertPackages(ICollection<PackageServiceModel> serviceModels)
+        public static ICollection<PackageResponseModel> ConvertPackages(ICollection<PackageServiceModel> packageServiceModels,
+            ICollection<PersonServiceModel> personServiceModels, ICollection<Room> rooms)
         {
             List<PackageResponseModel> responseModels = new List<PackageResponseModel>();
 
-            foreach(var serviceModel in serviceModels)
+            foreach(var serviceModel in packageServiceModels)
             {
-                PackageResponseModel responseModel = ConvertPackage(serviceModel);
+                PersonServiceModel personServiceModel = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.ReceiverId);
+                Room room = rooms.FirstOrDefault(r => r.Id.ToString() == serviceModel.CollectionPointId);
+
+                PackageResponseModel responseModel = ConvertPackage(serviceModel, personServiceModel, room);
                 responseModels.Add(responseModel);
             }
 

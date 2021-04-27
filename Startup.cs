@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using api_gateway.Helper;
+using Flurl.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -33,6 +34,8 @@ namespace api_gateway
             Constants.PersonApiUrl = Configuration.GetValue<string>("PersonApiUrl");
 
             services.AddControllers();
+
+            FlurlHttp.Configure(settings => settings.AllowedHttpStatusRange = "400-404,6xx");
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();
