@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using api_gateway.Helper;
 using Newtonsoft.Json;
 using System.Net;
+using api_gateway.Models.ServiceModels.Location;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -97,7 +98,17 @@ namespace api_gateway.Controllers
             }
 
             PersonServiceModel personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
-            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, personModel);
+            IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/room/{packageModel.CollectionPointId}".GetAsync();
+            var errLocationResponse = locationResponse.GetResponse();
+
+            if (errLocationResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(errLocationResponse.Message) { StatusCode = (int)errLocationResponse.StatusCode };
+            }
+
+            Room room = await locationResponse.GetJsonAsync<Room>();
+
+            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, personModel, room);
             return Ok(responseModel);
 
         }

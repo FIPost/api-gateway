@@ -1,5 +1,6 @@
 ﻿using api_gateway.Models.ResponseModels;
 using api_gateway.Models.ServiceModels;
+using api_gateway.Models.ServiceModels.Location;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +19,8 @@ namespace api_gateway.Models.Converters
                 serviceModel.Id,
                 serviceModel.Sender,
                 serviceModel.TrackAndTraceId,
-                serviceModel.CollectionPointId,
-                new PersonServiceModel(),
+                null,
+                null,
                 serviceModel.Name,
                 serviceModel.Status,
                 serviceModel.RouteFinished,
@@ -27,13 +28,13 @@ namespace api_gateway.Models.Converters
                 );
         }
 
-        public static PackageResponseModel ConvertPackage(PackageServiceModel serviceModel, PersonServiceModel personServiceModel)
+        public static PackageResponseModel ConvertPackage(PackageServiceModel serviceModel, PersonServiceModel personServiceModel, Room room)
         {
             return new PackageResponseModel(
                 serviceModel.Id,
                 serviceModel.Sender,
                 serviceModel.TrackAndTraceId,
-                serviceModel.CollectionPointId,
+                room,
                 personServiceModel,
                 serviceModel.Name,
                 serviceModel.Status,
