@@ -11,6 +11,8 @@ using api_gateway.Models.RequestModels;
 using Microsoft.AspNetCore.Http;
 using api_gateway.Helper;
 using Newtonsoft.Json;
+using System.Net;
+using api_gateway.Models.ServiceModels.Location;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -42,22 +44,39 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<PackageResponseModel>>> Get()
         {
-            IFlurlResponse response = await $"{Constants.PackageApiUrl}/api/packages".GetAsync();
+            IFlurlResponse packageResponse = await $"{Constants.PackageApiUrl}/api/packages".GetAsync();
+            var errPackageResponse = packageResponse.GetResponse();
 
-            if(response.StatusCode >= 500)
+            if (errPackageResponse.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
             }
-            else if(response.StatusCode >= 400)
+
+            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/room".GetAsync();
+            var errLocationResponse = locationResponse.GetResponse();
+
+            if (errLocationResponse.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(400);
+                return new ObjectResult(errLocationResponse.Message) { StatusCode = (int)errLocationResponse.StatusCode };
             }
-            else
+
+            IFlurlResponse personResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
+            var errPersonResponse = personResponse.GetResponse();
+
+            if (errPersonResponse.StatusCode != HttpStatusCode.OK)
             {
-                ICollection<PackageServiceModel> serviceModels = await response.GetJsonAsync<ICollection<PackageServiceModel>>();
-                ICollection<PackageResponseModel> responseModels = ServiceToResponseModelConverter.ConvertPackages(serviceModels);
-                return Ok(responseModels);
+                return new ObjectResult(errPersonResponse.Message) { StatusCode = (int)errPersonResponse.StatusCode };
             }
+
+            ICollection<PackageServiceModel> allPackageServiceModels = await packageResponse.GetJsonAsync<ICollection<PackageServiceModel>>();
+            ICollection<Room> allRooms = await locationResponse.GetJsonAsync<ICollection<Room>>();
+            ICollection<PersonServiceModel> allPersonServiceModels = await personResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
+
+            ICollection<PackageResponseModel> allPackages = ServiceToResponseModelConverter.ConvertPackages(allPackageServiceModels, allPersonServiceModels, allRooms);
+
+
+            return Ok(allPackages);
+
         }
 
 
@@ -77,26 +96,37 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PackageResponseModel>> GetById(Guid id)
         {
-            IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".GetAsync();
+            IFlurlResponse packageResponse = await $"{ Constants.PackageApiUrl }/api/packages/{id}".GetAsync();
 
-            if(response.StatusCode == 404)
+            var errPackageResponse = packageResponse.GetResponse();
+
+            if (errPackageResponse.StatusCode != HttpStatusCode.OK)
             {
-                return NotFound();
+                return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
             }
-            else if(response.StatusCode >= 400)
+            PackageServiceModel packageModel = await packageResponse.GetJsonAsync<PackageServiceModel>();
+
+            IFlurlResponse personResponse = await $"{ Constants.PersonApiUrl }/api/persons/{packageModel.ReceiverId}".GetAsync();
+            var errPersonResponse = personResponse.GetResponse();
+            PersonServiceModel personModel = null;
+
+            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
             {
-                return StatusCode(400);
+                personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
             }
-            else if(response.StatusCode >= 500)
+
+            IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/room/{packageModel.CollectionPointId}".GetAsync();
+            var errLocationResponse = locationResponse.GetResponse();
+            Room room = null;
+
+            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                room = await locationResponse.GetJsonAsync<Room>();
             }
-            else
-            {
-                PackageServiceModel model = await response.GetJsonAsync<PackageServiceModel>();
-                PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(model);
-                return Ok(responseModel);
-            }
+
+            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, personModel, room);
+            return Ok(responseModel);
+
         }
 
         /// <summary>
@@ -115,11 +145,11 @@ namespace api_gateway.Controllers
         {
             IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages".PostJsonAsync(request);
 
-            if(response.StatusCode >= 500)
+            if (response.StatusCode >= 500)
             {
                 return StatusCode(500);
             }
-            else if(response.StatusCode >= 400)
+            else if (response.StatusCode >= 400)
             {
                 return StatusCode(400);
             }
@@ -151,15 +181,15 @@ namespace api_gateway.Controllers
         {
             IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".PutJsonAsync(request);
 
-            if(response.StatusCode == 404)
+            if (response.StatusCode == 404)
             {
                 return NotFound();
             }
-            else if(response.StatusCode >= 400)
+            else if (response.StatusCode >= 400)
             {
                 return StatusCode(400);
             }
-            else if(response.StatusCode >= 500)
+            else if (response.StatusCode >= 500)
             {
                 return StatusCode(500);
             }
@@ -189,16 +219,16 @@ namespace api_gateway.Controllers
         public async Task<ActionResult> Delete(Guid id)
         {
             IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".DeleteAsync();
-            
-            if(response.StatusCode == 404)
+
+            if (response.StatusCode == 404)
             {
                 return NotFound();
             }
-            else if(response.StatusCode >= 400)
+            else if (response.StatusCode >= 400)
             {
                 return StatusCode(400);
             }
-            else if(response.StatusCode >= 500)
+            else if (response.StatusCode >= 500)
             {
                 return StatusCode(500);
             }
