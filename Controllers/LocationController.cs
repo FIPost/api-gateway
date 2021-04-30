@@ -66,7 +66,6 @@ namespace api_gateway.Controllers
         public async Task<ActionResult<ICollection<City>>> GetCities()
         {
             IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/City".GetAsync();
-
             if (response.StatusCode >= 500)
             {
                 return StatusCode(500);
@@ -285,7 +284,7 @@ namespace api_gateway.Controllers
         }
 
         /// <summary>
-        /// Creates a new buildiung
+        /// Creates a new building
         /// </summary>
         /// <param name="request">Buildiung request model</param>
         /// <returns>the newly created building</returns>
@@ -314,5 +313,78 @@ namespace api_gateway.Controllers
                 return CreatedAtAction("PostBuilding", responseModel);
             }
         }
+
+
+        #region Put methods.
+
+        [HttpPut("buildings")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Building>> PutBuilding(BuildingRequestModel request, Guid id)
+        {
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/building/{id}".PutJsonAsync(request);
+
+            if (response.StatusCode >= 500)
+            {
+                return StatusCode(500);
+            }
+            else if (response.StatusCode >= 400)
+            {
+                return StatusCode(400);
+            }
+            else
+            {
+                Building responseModel = await response.GetJsonAsync<Building>();
+                return CreatedAtAction("PutBuilding", responseModel);
+            }
+        }
+
+        [HttpPut("cities")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<City>> PutCity(CityRequestModel request, Guid id)
+        {
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/City/{id}".PutJsonAsync(request);
+
+            if (response.StatusCode >= 500)
+            {
+                return StatusCode(500);
+            }
+            else if (response.StatusCode >= 400)
+            {
+                return StatusCode(400);
+            }
+            else
+            {
+                City responseModel = await response.GetJsonAsync<City>();
+                return CreatedAtAction("PutCity", responseModel);
+            }
+        }
+
+        [HttpPut("rooms")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Room>> PutRoom(RoomRequestModel request, Guid id)
+        {
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/Room/{id}".PutJsonAsync(request);
+
+            if (response.StatusCode >= 500)
+            {
+                return StatusCode(500);
+            }
+            else if (response.StatusCode >= 400)
+            {
+                return StatusCode(400);
+            }
+            else
+            {
+                Room responseModel = await response.GetJsonAsync<Room>();
+                return CreatedAtAction("PutRoom", responseModel);
+            }
+        }
+        #endregion
     }
 }
