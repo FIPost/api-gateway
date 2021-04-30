@@ -15,8 +15,29 @@
 API Gateway for communication between the frontend and backend. Abstracts calls into user-friendly endpoints and adds a secure entrypoint layer on top of the individual microservices.
 
 ## Getting Started
-```zsh
+
+### Docker
+Run the gateway.
+
+This uses `appsettings.Docker.json`.
+
+```sh
 docker-compose up --build
+```
+
+Run the other services.
+```sh
+# /pakketservice/
+docker-compose up --build 
+```
+```sh
+# /locatieservice/
+docker-compose up --build 
+```
+
+```sh
+# /personeel-service/
+docker-compose up --build 
 ```
 
 #### Error: Docker Network Missing
@@ -24,4 +45,29 @@ If you get the following error:
 Network `ipost-network` declared as external, but could not be found. Run the following:
 ```zsh
 docker network create ipost-network
+```
+
+
+## Debug the gateway.
+
+### Step 1
+Run the gateway with `Visual Studio` or the `.NET CLI`. 
+
+This uses `appsettings.Development.json`.
+
+### Step 2
+Run the other services in `Docker`.
+
+```sh
+# /pakketservice/
+docker-compose up --build 
+```
+```sh
+# /locatieservice/
+docker-compose up --build 
+```
+
+```sh
+# /personeel-service/
+docker-compose up --build 
 ```
