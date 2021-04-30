@@ -10,7 +10,7 @@ namespace api_gateway.Models.ResponseModels
     {
         public Guid Id { get; set; }
         public string ToDoLocationId { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public Double CreatedAt { get; set; }
         public string CreatedByPCN { get; set; }
         public double FinishedAt { get; set; }
         public string FinishedByPCN { get; set; }
@@ -18,7 +18,7 @@ namespace api_gateway.Models.ResponseModels
         public string NextTicketId { get; set; }
         public TicketAction TicketAction { get; set; }
 
-        public TicketResponseModel(Guid id, string toDoLocationId, DateTime createdAt, string createdByPCN, double finishedAt, string finishedByPCN, bool isFinished, string nextTicketId, TicketAction ticketAction)
+        public TicketResponseModel(Guid id, string toDoLocationId, Double createdAt, string createdByPCN, double finishedAt, string finishedByPCN, bool isFinished, string nextTicketId, TicketAction ticketAction)
         {
             Id = id;
             ToDoLocationId = toDoLocationId;
