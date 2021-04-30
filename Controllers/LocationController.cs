@@ -66,7 +66,6 @@ namespace api_gateway.Controllers
         public async Task<ActionResult<ICollection<City>>> GetCities()
         {
             IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/City".GetAsync();
-
             if (response.StatusCode >= 500)
             {
                 return StatusCode(500);
@@ -285,7 +284,7 @@ namespace api_gateway.Controllers
         }
 
         /// <summary>
-        /// Creates a new buildiung
+        /// Creates a new building
         /// </summary>
         /// <param name="request">Buildiung request model</param>
         /// <returns>the newly created building</returns>
@@ -312,6 +311,37 @@ namespace api_gateway.Controllers
             {
                 Building responseModel = await response.GetJsonAsync<Building>();
                 return CreatedAtAction("PostBuilding", responseModel);
+            }
+        }
+
+        /// <summary>
+        /// Creates a new buildiung
+        /// </summary>
+        /// <param name="request">Buildiung request model</param>
+        /// <returns>the newly created building</returns>
+        /// <response code="201">A new building has been created</response>
+        /// <response code="400">bad request, something went wrong on the client-side</response>
+        /// <response code="500">processing error, something went wrong on the server-side</response>
+        [HttpPut("buildings")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Building>> PutBuilding(BuildingRequestModel request)
+        {
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/building".PutJsonAsync(request);
+
+            if (response.StatusCode >= 500)
+            {
+                return StatusCode(500);
+            }
+            else if (response.StatusCode >= 400)
+            {
+                return StatusCode(400);
+            }
+            else
+            {
+                Building responseModel = await response.GetJsonAsync<Building>();
+                return CreatedAtAction("PutBuilding", responseModel);
             }
         }
     }
