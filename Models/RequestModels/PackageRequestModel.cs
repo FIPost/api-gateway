@@ -10,6 +10,6 @@ namespace api_gateway.Models.RequestModels
         public string Sender { get; set; }
         public string ReceiverId { get; set; }
         public string Name { get; set; }
-        public string CollectionPointId { get; set; }
+        public Guid CollectionPointId { get; set; }
     }
 }

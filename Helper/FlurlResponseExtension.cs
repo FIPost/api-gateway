@@ -14,6 +14,8 @@ namespace api_gateway.Helper
         {
             switch (flurlResponse.StatusCode)
             {
+                case 201:
+                    return new ErrorResponse(HttpStatusCode.Created, "");
                 case 400:
                     return new ErrorResponse(HttpStatusCode.BadRequest, "Er ging iets mis. Probeer het later opnieuw");
                 case 404:
