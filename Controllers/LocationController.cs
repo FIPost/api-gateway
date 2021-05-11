@@ -234,7 +234,8 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Room>> PostRoom(RoomRequestModel request){
+        public async Task<ActionResult<Room>> PostRoom(RoomRequestModel request)
+        {
             IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/Room".PostJsonAsync(request);
 
             if (response.StatusCode >= 500)
@@ -383,6 +384,63 @@ namespace api_gateway.Controllers
             {
                 Room responseModel = await response.GetJsonAsync<Room>();
                 return CreatedAtAction("PutRoom", responseModel);
+            }
+        }
+        #endregion
+
+        #region Delete methods.
+        [HttpDelete("buildings")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeleteBuilding(Guid id)
+        {
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/building/{id}".DeleteAsync();
+
+            if (response.StatusCode == 204)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(500, response.ResponseMessage);
+            }
+        }
+
+
+        [HttpDelete("cities")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeleteCity(Guid id)
+        {
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/city/{id}".DeleteAsync();
+
+            if (response.StatusCode == 204)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(500, response.ResponseMessage);
+            }
+        }
+
+        [HttpDelete("rooms")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> DeleteRoom(Guid id)
+        {
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/room/{id}".DeleteAsync();
+
+            if (response.StatusCode == 204)
+            {
+                return NoContent();
+            }
+            else
+            {
+                return StatusCode(500, response.ResponseMessage);
             }
         }
         #endregion
