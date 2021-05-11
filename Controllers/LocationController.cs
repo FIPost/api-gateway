@@ -8,6 +8,7 @@ using Flurl.Http;
 using api_gateway.Models.RequestModels.Location;
 using Microsoft.AspNetCore.Http;
 using api_gateway.Helper;
+using System.Net;
 
 namespace api_gateway.Controllers
 {
@@ -396,15 +397,14 @@ namespace api_gateway.Controllers
         public async Task<ActionResult> DeleteBuilding(Guid id)
         {
             IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/building/{id}".DeleteAsync();
+            var buildingResponse = response.GetResponse("Het meegegeven gebouw bestaat niet");
 
-            if (response.StatusCode == 204)
+            if (buildingResponse.StatusCode != HttpStatusCode.NoContent) // Service returns 204 on delete.
             {
-                return NoContent();
+                return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
             }
-            else
-            {
-                return StatusCode(500, response.ResponseMessage);
-            }
+
+            return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
         }
 
 
@@ -415,15 +415,14 @@ namespace api_gateway.Controllers
         public async Task<ActionResult> DeleteCity(Guid id)
         {
             IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/city/{id}".DeleteAsync();
+            var cityResponse = response.GetResponse("De meegegeven stad bestaat niet");
 
-            if (response.StatusCode == 204)
+            if (cityResponse.StatusCode != HttpStatusCode.NoContent) // Service returns 204 on delete.
             {
-                return NoContent();
+                return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
             }
-            else
-            {
-                return StatusCode(500, response.ResponseMessage);
-            }
+
+            return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
         }
 
         [HttpDelete("rooms")]
@@ -433,15 +432,14 @@ namespace api_gateway.Controllers
         public async Task<ActionResult> DeleteRoom(Guid id)
         {
             IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/room/{id}".DeleteAsync();
+            var roomResponse = response.GetResponse("De meegegeven ruimte bestaat niet");
 
-            if (response.StatusCode == 204)
+            if (roomResponse.StatusCode != HttpStatusCode.NoContent) // Service returns 204 on delete.
             {
-                return NoContent();
+                return new ObjectResult(roomResponse.Message) { StatusCode = (int)roomResponse.StatusCode };
             }
-            else
-            {
-                return StatusCode(500, response.ResponseMessage);
-            }
+
+            return new ObjectResult(roomResponse.Message) { StatusCode = (int)roomResponse.StatusCode };
         }
         #endregion
     }
