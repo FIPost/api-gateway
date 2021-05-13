@@ -36,21 +36,16 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<Room>>> GetRooms()
         {
-            IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/Room".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Room".GetAsync();
+            var response = flurlResponse.GetResponse("Er kunnen geen ruimtes gevonden worden");
 
-            if (response.StatusCode >= 500)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                ICollection<Room> responseModels = await response.GetJsonAsync<ICollection<Room>>();
-                return Ok(responseModels);
-            }
+
+            ICollection<Room> responseModels = await flurlResponse.GetJsonAsync<ICollection<Room>>();
+            return Ok(responseModels);
         }
 
         /// <summary>
@@ -66,20 +61,16 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<City>>> GetCities()
         {
-            IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/City".GetAsync();
-            if (response.StatusCode >= 500)
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/City".GetAsync();
+            var response = flurlResponse.GetResponse("Er kunnen geen steden gevonden worden");
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                ICollection<City> responseModels = await response.GetJsonAsync<ICollection<City>>();
-                return Ok(responseModels);
-            }
+
+            ICollection<City> responseModels = await flurlResponse.GetJsonAsync<ICollection<City>>();
+            return Ok(responseModels);
         }
 
         /// <summary>
@@ -95,21 +86,16 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<Building>>> GetBuildings()
         {
-            IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/Building".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Building".GetAsync();
+            var response = flurlResponse.GetResponse("Er kunnen geen gebouwen gevonden worden");
 
-            if (response.StatusCode >= 500)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                ICollection<Building> responseModels = await response.GetJsonAsync<ICollection<Building>>();
-                return Ok(responseModels);
-            }
+
+            ICollection<Building> responseModels = await flurlResponse.GetJsonAsync<ICollection<Building>>();
+            return Ok(responseModels);
         }
 
         /// <summary>
@@ -128,25 +114,17 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Room>> GetRoomById(Guid id)
         {
-            IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/Room/{id}".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Room/{id}".GetAsync();
+            var response = flurlResponse.GetResponse("Deze ruimte kan niet gevonden worden");
 
-            if (response.StatusCode == 404)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return NotFound();
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else if (response.StatusCode >= 500)
-            {
-                return StatusCode(500);
-            }
-            else
-            {
-                Room responseModel = await response.GetJsonAsync<Room>();
-                return Ok(responseModel);
-            }
+
+            Room responseModel = await flurlResponse.GetJsonAsync<Room>();
+            return Ok(responseModel);
+            
         }
 
         /// <summary>
@@ -165,25 +143,17 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<City>> GetCityById(Guid id)
         {
-            IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/City/{id}".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/City/{id}".GetAsync();
+            var response = flurlResponse.GetResponse("Deze stad kan niet gevonden worden");
 
-            if (response.StatusCode == 404)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return NotFound();
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else if (response.StatusCode >= 500)
-            {
-                return StatusCode(500);
-            }
-            else
-            {
-                City responseModel = await response.GetJsonAsync<City>();
-                return Ok(responseModel);
-            }
+
+            City responseModel = await flurlResponse.GetJsonAsync<City>();
+            return Ok(responseModel);
+            
         }
 
         /// <summary>
@@ -202,25 +172,16 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Building>> GetBuildingById(Guid id)
         {
-            IFlurlResponse response = await $"{Constants.LocationApiUrl}/api/Building/{id}".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Building/{id}".GetAsync();
+            var response = flurlResponse.GetResponse("Dit gebouw kan niet gevonden worden");
 
-            if (response.StatusCode == 404)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return NotFound();
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else if (response.StatusCode >= 500)
-            {
-                return StatusCode(500);
-            }
-            else
-            {
-                Building responseModel = await response.GetJsonAsync<Building>();
-                return Ok(responseModel);
-            }
+
+            Building responseModel = await flurlResponse.GetJsonAsync<Building>();
+            return Ok(responseModel);
         }
 
         /// <summary>
@@ -237,21 +198,23 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Room>> PostRoom(RoomRequestModel request)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/Room".PostJsonAsync(request);
+            ObjectResult buildingResponse = await BuildingExists(request.BuildingId.ToString());
+            if (buildingResponse.StatusCode != 200)
+            {
+                return buildingResponse;
+            }
 
-            if (response.StatusCode >= 500)
+            //post room
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/Room".PostJsonAsync(request);
+            var response = flurlResponse.GetResponse();
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                Room responseModel = await response.GetJsonAsync<Room>();
-                return CreatedAtAction("PostRoom", responseModel);
-            }
+
+            Room responseModel = await flurlResponse.GetJsonAsync<Room>();
+            return CreatedAtAction("PostRoom", responseModel);
         }
 
         /// <summary>
@@ -268,21 +231,16 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<City>> PostCity(CityRequestModel request)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/City".PostJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/City".PostJsonAsync(request);
+            var response = flurlResponse.GetResponse();
 
-            if (response.StatusCode >= 500)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                City responseModel = await response.GetJsonAsync<City>();
-                return CreatedAtAction("PostCity", responseModel);
-            }
+
+            City responseModel = await flurlResponse.GetJsonAsync<City>();
+            return CreatedAtAction("PostCity", responseModel);
         }
 
         /// <summary>
@@ -299,21 +257,23 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Building>> PostBuilding(BuildingRequestModel request)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/Building".PostJsonAsync(request);
+            ObjectResult cityResponse = await CityExists(request.Address.CityId.ToString());
+            if (cityResponse.StatusCode != 200)
+            {
+                return cityResponse;
+            }
 
-            if (response.StatusCode >= 500)
+            //post building
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/Building".PostJsonAsync(request);
+            var response = flurlResponse.GetResponse();
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                Building responseModel = await response.GetJsonAsync<Building>();
-                return CreatedAtAction("PostBuilding", responseModel);
-            }
+
+            Building responseModel = await flurlResponse.GetJsonAsync<Building>();
+            return CreatedAtAction("PostBuilding", responseModel);
         }
 
 
@@ -325,21 +285,24 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Building>> PutBuilding(BuildingRequestModel request, Guid id)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/building/{id}".PutJsonAsync(request);
+            ObjectResult cityResponse = await CityExists(request.Address.CityId.ToString());
+            if (cityResponse.StatusCode != 200)
+            {
+                return cityResponse;
+            }
 
-            if (response.StatusCode >= 500)
+            //put building
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/building/{id}".PutJsonAsync(request);
+            var response = flurlResponse.GetResponse();
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                Building responseModel = await response.GetJsonAsync<Building>();
-                return CreatedAtAction("PutBuilding", responseModel);
-            }
+
+            Building responseModel = await flurlResponse.GetJsonAsync<Building>();
+            return CreatedAtAction("PutBuilding", responseModel);
+            
         }
 
         [HttpPut("cities")]
@@ -348,21 +311,17 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<City>> PutCity(CityRequestModel request, Guid id)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/City/{id}".PutJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/City/{id}".PutJsonAsync(request);
+            var response = flurlResponse.GetResponse();
 
-            if (response.StatusCode >= 500)
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                City responseModel = await response.GetJsonAsync<City>();
-                return CreatedAtAction("PutCity", responseModel);
-            }
+
+            City responseModel = await flurlResponse.GetJsonAsync<City>();
+            return CreatedAtAction("PutCity", responseModel);
+            
         }
 
         [HttpPut("rooms")]
@@ -371,21 +330,51 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Room>> PutRoom(RoomRequestModel request, Guid id)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/Room/{id}".PutJsonAsync(request);
+            ObjectResult buildingResponse = await BuildingExists(request.BuildingId.ToString());
+            if (buildingResponse.StatusCode != 200)
+            {
+                return buildingResponse;
+            }
 
-            if (response.StatusCode >= 500)
+            //put room
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/Room/{id}".PutJsonAsync(request);
+            var response = flurlResponse.GetResponse();
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
+
+            Room responseModel = await flurlResponse.GetJsonAsync<Room>();
+            return CreatedAtAction("PutRoom", responseModel);
+
+        }
+        #endregion
+
+        private async Task<ObjectResult> CityExists(string id)
+        {
+            IFlurlResponse flurlCityResponse = await $"{ Constants.LocationApiUrl }/api/City/{id}".GetAsync();
+            var cityResponse = flurlCityResponse.GetResponse("De meegegeven stad bestaat niet");
+
+            if (cityResponse.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(400);
+                return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
             }
-            else
+
+            return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
+        }
+
+        private async Task<ObjectResult> BuildingExists(string id)
+        {
+            IFlurlResponse flurlBuildingResponse = await $"{ Constants.LocationApiUrl }/api/Building/{id}".GetAsync();
+            var buildingResponse = flurlBuildingResponse.GetResponse("Het meegegeven gebouw bestaat niet");
+
+            if (buildingResponse.StatusCode != HttpStatusCode.OK)
             {
-                Room responseModel = await response.GetJsonAsync<Room>();
-                return CreatedAtAction("PutRoom", responseModel);
+                return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
             }
+
+            return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
         }
         #endregion
 

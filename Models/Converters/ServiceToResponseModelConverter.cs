@@ -84,13 +84,19 @@ namespace api_gateway.Models.Converters
 
             foreach(var serviceModel in packageServiceModels)
             {
-                PersonServiceModel personServiceModel = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.ReceiverId);
-                Room room = rooms.FirstOrDefault(r => r.Id.ToString() == serviceModel.CollectionPointId);
-
+                PersonServiceModel personServiceModel = null;
+                Room room = null;
+                if (personServiceModels != null)
+                {
+                    personServiceModel = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.ReceiverId);
+                }
+                if (rooms != null)
+                {
+                    room = rooms.FirstOrDefault(r => r.Id.ToString() == serviceModel.CollectionPointId);
+                }
                 PackageResponseModel responseModel = ConvertPackage(serviceModel, personServiceModel, room);
                 responseModels.Add(responseModel);
             }
-
             return responseModels;
         }
     }
