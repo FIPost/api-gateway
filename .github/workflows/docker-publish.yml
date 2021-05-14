@@ -19,6 +19,7 @@ jobs:
             files: 'appsettings.json'
         env:
             PackageApiUrl: "${{ secrets.PAKKET_URL }}"
+            PersonApiUrl: "${{ secrets.PERSON_URL }}"
             LocationApiUrl: "${{ secrets.LOCATION_URL }}"
           
       - name: Push to Docker Hub
