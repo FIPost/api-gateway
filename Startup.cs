@@ -35,7 +35,7 @@ namespace api_gateway
 
             services.AddControllers();
 
-            FlurlHttp.Configure(settings => settings.AllowedHttpStatusRange = "400-404,6xx");
+            FlurlHttp.Configure(settings => settings.AllowedHttpStatusRange = "400-504,6xx");
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen();

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace api_gateway.Controllers
@@ -28,21 +29,17 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<PersonServiceModel>>> GetPersons()
         {
-            IFlurlResponse response = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
 
-            if (response.StatusCode >= 500)
+            var response = flurlResponse.GetResponse("Er zijn geen personen gevonden.");
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return StatusCode(500);
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else
-            {
-                ICollection<PersonServiceModel> responseModels = await response.GetJsonAsync<ICollection<PersonServiceModel>>();
-                return Ok(responseModels);
-            }
+
+            ICollection<PersonServiceModel> responseModels = await flurlResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
+            return Ok(responseModels);
         }
 
         /// <summary>
@@ -61,25 +58,17 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<PersonServiceModel>> GetPersonById(string id)
         {
-            IFlurlResponse response = await $"{Constants.PersonApiUrl}/api/persons/{id}".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.PersonApiUrl}/api/persons/{id}".GetAsync();
 
-            if (response.StatusCode == 404)
+            var response = flurlResponse.GetResponse("De persoon die u probeert op te zoeken kan niet gevonden worden.");
+
+            if (response.StatusCode != HttpStatusCode.OK)
             {
-                return NotFound();
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else if (response.StatusCode >= 500)
-            {
-                return StatusCode(500);
-            }
-            else
-            {
-                PersonServiceModel responseModel = await response.GetJsonAsync<PersonServiceModel>();
-                return Ok(responseModel);
-            }
+
+            PersonServiceModel responseModel = await flurlResponse.GetJsonAsync<PersonServiceModel>();
+            return Ok(responseModel);
         }
     }
 }
