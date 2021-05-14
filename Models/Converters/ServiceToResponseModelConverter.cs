@@ -1,5 +1,6 @@
 ﻿using api_gateway.Models.ResponseModels;
 using api_gateway.Models.ServiceModels;
+using api_gateway.Models.ServiceModels.Location;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,25 @@ namespace api_gateway.Models.Converters
         {
             return new PackageResponseModel(
                 serviceModel.Id,
-                serviceModel.ReceiverId,
-                serviceModel.TrackAndTraceId,
-                serviceModel.CollectionPointId,
                 serviceModel.Sender,
+                serviceModel.TrackAndTraceId,
+                null,
+                null,
+                serviceModel.Name,
+                serviceModel.Status,
+                serviceModel.RouteFinished,
+                ConvertTickets(serviceModel.Tickets)
+                );
+        }
+
+        public static PackageResponseModel ConvertPackage(PackageServiceModel serviceModel, PersonServiceModel personServiceModel, Room room)
+        {
+            return new PackageResponseModel(
+                serviceModel.Id,
+                serviceModel.Sender,
+                serviceModel.TrackAndTraceId,
+                room,
+                personServiceModel,
                 serviceModel.Name,
                 serviceModel.Status,
                 serviceModel.RouteFinished,
@@ -61,16 +77,26 @@ namespace api_gateway.Models.Converters
             return responseModels;
         }
 
-        public static ICollection<PackageResponseModel> ConvertPackages(ICollection<PackageServiceModel> serviceModels)
+        public static ICollection<PackageResponseModel> ConvertPackages(ICollection<PackageServiceModel> packageServiceModels,
+            ICollection<PersonServiceModel> personServiceModels, ICollection<Room> rooms)
         {
             List<PackageResponseModel> responseModels = new List<PackageResponseModel>();
 
-            foreach(var serviceModel in serviceModels)
+            foreach(var serviceModel in packageServiceModels)
             {
-                PackageResponseModel responseModel = ConvertPackage(serviceModel);
+                PersonServiceModel personServiceModel = null;
+                Room room = null;
+                if (personServiceModels != null)
+                {
+                    personServiceModel = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.ReceiverId);
+                }
+                if (rooms != null)
+                {
+                    room = rooms.FirstOrDefault(r => r.Id.ToString() == serviceModel.CollectionPointId);
+                }
+                PackageResponseModel responseModel = ConvertPackage(serviceModel, personServiceModel, room);
                 responseModels.Add(responseModel);
             }
-
             return responseModels;
         }
     }
