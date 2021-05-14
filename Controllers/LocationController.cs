@@ -278,7 +278,6 @@ namespace api_gateway.Controllers
 
 
         #region Put methods.
-
         [HttpPut("buildings")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -351,33 +350,6 @@ namespace api_gateway.Controllers
         }
         #endregion
 
-        private async Task<ObjectResult> CityExists(string id)
-        {
-            IFlurlResponse flurlCityResponse = await $"{ Constants.LocationApiUrl }/api/City/{id}".GetAsync();
-            var cityResponse = flurlCityResponse.GetResponse("De meegegeven stad bestaat niet");
-
-            if (cityResponse.StatusCode != HttpStatusCode.OK)
-            {
-                return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
-            }
-
-            return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
-        }
-
-        private async Task<ObjectResult> BuildingExists(string id)
-        {
-            IFlurlResponse flurlBuildingResponse = await $"{ Constants.LocationApiUrl }/api/Building/{id}".GetAsync();
-            var buildingResponse = flurlBuildingResponse.GetResponse("Het meegegeven gebouw bestaat niet");
-
-            if (buildingResponse.StatusCode != HttpStatusCode.OK)
-            {
-                return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
-            }
-
-            return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
-        }
-        #endregion
-
         #region Delete methods.
         [HttpDelete("buildings")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -429,6 +401,34 @@ namespace api_gateway.Controllers
             }
 
             return new ObjectResult(roomResponse.Message) { StatusCode = (int)roomResponse.StatusCode };
+        }
+        #endregion
+
+        #region Helper methods.
+        private async Task<ObjectResult> CityExists(string id)
+        {
+            IFlurlResponse flurlCityResponse = await $"{ Constants.LocationApiUrl }/api/City/{id}".GetAsync();
+            var cityResponse = flurlCityResponse.GetResponse("De meegegeven stad bestaat niet");
+
+            if (cityResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
+            }
+
+            return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
+        }
+
+        private async Task<ObjectResult> BuildingExists(string id)
+        {
+            IFlurlResponse flurlBuildingResponse = await $"{ Constants.LocationApiUrl }/api/Building/{id}".GetAsync();
+            var buildingResponse = flurlBuildingResponse.GetResponse("Het meegegeven gebouw bestaat niet");
+
+            if (buildingResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
+            }
+
+            return new ObjectResult(buildingResponse.Message) { StatusCode = (int)buildingResponse.StatusCode };
         }
         #endregion
     }
