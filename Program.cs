@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -18,10 +20,32 @@ namespace api_gateway
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+
+            .ConfigureServices((context, services) =>
+            {
+                services.Configure<KestrelServerOptions>(
+                    context.Configuration.GetSection("Kestrel"));
+            })
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.ConfigureKestrel(serverOptions =>
                 {
-                    webBuilder.UseStartup<Startup>()
-                    .UseUrls("http://*:8123");
-                });
+                    serverOptions.Limits.MaxConcurrentConnections = 100;
+                    serverOptions.Limits.MaxConcurrentUpgradedConnections = 100;
+                    serverOptions.Limits.MaxRequestBodySize = 10 * 1024;
+                    serverOptions.Limits.MinRequestBodyDataRate =
+                        new MinDataRate(bytesPerSecond: 100,
+                            gracePeriod: TimeSpan.FromSeconds(10));
+                    serverOptions.Limits.MinResponseDataRate =
+                        new MinDataRate(bytesPerSecond: 100,
+                            gracePeriod: TimeSpan.FromSeconds(10));
+                    serverOptions.Limits.KeepAliveTimeout =
+                        TimeSpan.FromDays(30);
+                    serverOptions.Limits.RequestHeadersTimeout =
+                        TimeSpan.FromDays(30);
+                })
+                .UseStartup<Startup>()
+                .UseUrls("http://*:8123");
+            });
     }
 }

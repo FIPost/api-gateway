@@ -70,5 +70,11 @@ namespace api_gateway.Controllers
             PersonServiceModel responseModel = await flurlResponse.GetJsonAsync<PersonServiceModel>();
             return Ok(responseModel);
         }
+        
+        [HttpGet("health")]
+        public ActionResult Health()
+        {
+            return Ok();
+        }
     }
 }
