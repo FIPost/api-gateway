@@ -16,13 +16,7 @@ namespace api_gateway.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        /// <summary>
-        /// Gets a list of all persons
-        /// </summary>
-        /// <returns>List of rooms</returns>
-        /// <response code="200">returns the list of persons</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
+        #region Get methods.
         [HttpGet("persons")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -42,15 +36,6 @@ namespace api_gateway.Controllers
             return Ok(responseModels);
         }
 
-        /// <summary>
-        /// Gets a specific person by id
-        /// </summary>
-        /// <param name="id">the id of the person</param>
-        /// <returns>person with matching id</returns>
-        /// <response code="200">Returns the person with the specified id</response>
-        /// <response code="404">No person found with the matching id</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpGet("persons/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -70,7 +55,8 @@ namespace api_gateway.Controllers
             PersonServiceModel responseModel = await flurlResponse.GetJsonAsync<PersonServiceModel>();
             return Ok(responseModel);
         }
-        
+        #endregion
+
         [HttpGet("health")]
         public ActionResult Health()
         {

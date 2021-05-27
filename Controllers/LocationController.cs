@@ -23,20 +23,14 @@ namespace api_gateway.Controllers
     public class LocationController : ControllerBase
     {
 
-        /// <summary>
-        /// Gets a list of all the available rooms from the location service
-        /// </summary>
-        /// <returns>List of rooms</returns>
-        /// <response code="200">returns the list of rooms</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
+        #region Get methods.
         [HttpGet("rooms")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<Room>>> GetRooms()
         {
-            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Room".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/rooms".GetAsync();
             var response = flurlResponse.GetResponse("Er kunnen geen ruimtes gevonden worden");
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -48,20 +42,13 @@ namespace api_gateway.Controllers
             return Ok(responseModels);
         }
 
-        /// <summary>
-        /// Gets a list of all the available cities from the location service
-        /// </summary>
-        /// <returns>List of cities</returns>
-        /// <response code="200">returns the list of cities</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpGet("cities")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<City>>> GetCities()
         {
-            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/City".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/cities".GetAsync();
             var response = flurlResponse.GetResponse("Er kunnen geen steden gevonden worden");
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -73,20 +60,13 @@ namespace api_gateway.Controllers
             return Ok(responseModels);
         }
 
-        /// <summary>
-        /// Gets a list of all the available buildings from the location service
-        /// </summary>
-        /// <returns>List of buildings</returns>
-        /// <response code="200">returns the list of buildings</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpGet("buildings")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<Building>>> GetBuildings()
         {
-            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Building".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/buildings".GetAsync();
             var response = flurlResponse.GetResponse("Er kunnen geen gebouwen gevonden worden");
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -98,15 +78,6 @@ namespace api_gateway.Controllers
             return Ok(responseModels);
         }
 
-        /// <summary>
-        /// Gets a specific room by id
-        /// </summary>
-        /// <param name="id">the id of the room</param>
-        /// <returns>room with matching id</returns>
-        /// <response code="200">Returns the room with the specified id</response>
-        /// <response code="404">No room found with the matching id</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpGet("rooms/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -114,7 +85,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Room>> GetRoomById(Guid id)
         {
-            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Room/{id}".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/rooms/{id}".GetAsync();
             var response = flurlResponse.GetResponse("Deze ruimte kan niet gevonden worden");
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -127,15 +98,6 @@ namespace api_gateway.Controllers
             
         }
 
-        /// <summary>
-        /// Gets a specific city by id
-        /// </summary>
-        /// <param name="id">the id of the city</param>
-        /// <returns>city with matching id</returns>
-        /// <response code="200">Returns the city with the specified id</response>
-        /// <response code="404">No city found with the matching id</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpGet("cities/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -143,7 +105,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<City>> GetCityById(Guid id)
         {
-            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/City/{id}".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/cities/{id}".GetAsync();
             var response = flurlResponse.GetResponse("Deze stad kan niet gevonden worden");
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -156,15 +118,6 @@ namespace api_gateway.Controllers
             
         }
 
-        /// <summary>
-        /// Gets a specific building by id
-        /// </summary>
-        /// <param name="id">the id of the building</param>
-        /// <returns>building with matching id</returns>
-        /// <response code="200">Returns the building with the specified id</response>
-        /// <response code="404">No building found with the matching id</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpGet("buildings/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -172,7 +125,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Building>> GetBuildingById(Guid id)
         {
-            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/Building/{id}".GetAsync();
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/buildings/{id}".GetAsync();
             var response = flurlResponse.GetResponse("Dit gebouw kan niet gevonden worden");
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -184,14 +137,65 @@ namespace api_gateway.Controllers
             return Ok(responseModel);
         }
 
-        /// <summary>
-        /// Creates a new room
-        /// </summary>
-        /// <param name="request">Room request model</param>
-        /// <returns>the newly created room</returns>
-        /// <response code="201">A new room has been created</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
+        [HttpGet("rooms/name/{name}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Room>> GetRoomByName(string name)
+        {
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/rooms/name/{name}".GetAsync();
+            var response = flurlResponse.GetResponse("Deze kamer kan niet gevonden worden");
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
+            }
+
+            Room responseModel = await flurlResponse.GetJsonAsync<Room>();
+            return Ok(responseModel);
+        }
+
+        [HttpGet("cities/name/{name}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<City>> GetCityByName(string name)
+        {
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/cities/name/{name}".GetAsync();
+            var response = flurlResponse.GetResponse("Deze stad kan niet gevonden worden");
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
+            }
+
+            City responseModel = await flurlResponse.GetJsonAsync<City>();
+            return Ok(responseModel);
+        }
+
+        [HttpGet("buildings/name/{name}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Building>> GetBuildingByName(string name)
+        {
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/buildings/name/{name}".GetAsync();
+            var response = flurlResponse.GetResponse("Dit gebouw kan niet gevonden worden");
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
+            }
+
+            Building responseModel = await flurlResponse.GetJsonAsync<Building>();
+            return Ok(responseModel);
+        }
+        #endregion
+
+        #region Post methods
         [HttpPost("rooms")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -205,7 +209,7 @@ namespace api_gateway.Controllers
             }
 
             //post room
-            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/Room".PostJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/rooms".PostJsonAsync(request);
             var response = flurlResponse.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -217,21 +221,13 @@ namespace api_gateway.Controllers
             return CreatedAtAction("PostRoom", responseModel);
         }
 
-        /// <summary>
-        /// Creates a new city
-        /// </summary>
-        /// <param name="request">City request model</param>
-        /// <returns>the newly created city</returns>
-        /// <response code="201">A new city has been created</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpPost("cities")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<City>> PostCity(CityRequestModel request)
         {
-            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/City".PostJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/cities".PostJsonAsync(request);
             var response = flurlResponse.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -243,14 +239,6 @@ namespace api_gateway.Controllers
             return CreatedAtAction("PostCity", responseModel);
         }
 
-        /// <summary>
-        /// Creates a new building
-        /// </summary>
-        /// <param name="request">Buildiung request model</param>
-        /// <returns>the newly created building</returns>
-        /// <response code="201">A new building has been created</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpPost("buildings")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -264,7 +252,7 @@ namespace api_gateway.Controllers
             }
 
             //post building
-            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/Building".PostJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/buildings".PostJsonAsync(request);
             var response = flurlResponse.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -275,10 +263,10 @@ namespace api_gateway.Controllers
             Building responseModel = await flurlResponse.GetJsonAsync<Building>();
             return CreatedAtAction("PostBuilding", responseModel);
         }
-
+        #endregion
 
         #region Put methods.
-        [HttpPut("buildings")]
+        [HttpPut("buildings/{id}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -291,7 +279,7 @@ namespace api_gateway.Controllers
             }
 
             //put building
-            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/building/{id}".PutJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/buildings/{id}".PutJsonAsync(request);
             var response = flurlResponse.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -304,13 +292,13 @@ namespace api_gateway.Controllers
             
         }
 
-        [HttpPut("cities")]
+        [HttpPut("cities/{id}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<City>> PutCity(CityRequestModel request, Guid id)
         {
-            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/City/{id}".PutJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/cities/{id}".PutJsonAsync(request);
             var response = flurlResponse.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -323,7 +311,7 @@ namespace api_gateway.Controllers
             
         }
 
-        [HttpPut("rooms")]
+        [HttpPut("rooms/{id}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -336,7 +324,7 @@ namespace api_gateway.Controllers
             }
 
             //put room
-            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/Room/{id}".PutJsonAsync(request);
+            IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/rooms/{id}".PutJsonAsync(request);
             var response = flurlResponse.GetResponse();
 
             if (response.StatusCode != HttpStatusCode.OK)
@@ -351,13 +339,13 @@ namespace api_gateway.Controllers
         #endregion
 
         #region Delete methods.
-        [HttpDelete("buildings")]
+        [HttpDelete("buildings/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteBuilding(Guid id)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/building/{id}".DeleteAsync();
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/buildings/{id}".DeleteAsync();
             var buildingResponse = response.GetResponse("Het meegegeven gebouw bestaat niet");
 
             if (buildingResponse.StatusCode != HttpStatusCode.NoContent) // Service returns 204 on delete.
@@ -369,13 +357,13 @@ namespace api_gateway.Controllers
         }
 
 
-        [HttpDelete("cities")]
+        [HttpDelete("cities/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteCity(Guid id)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/city/{id}".DeleteAsync();
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/cities/{id}".DeleteAsync();
             var cityResponse = response.GetResponse("De meegegeven stad bestaat niet");
 
             if (cityResponse.StatusCode != HttpStatusCode.NoContent) // Service returns 204 on delete.
@@ -386,13 +374,13 @@ namespace api_gateway.Controllers
             return new ObjectResult(cityResponse.Message) { StatusCode = (int)cityResponse.StatusCode };
         }
 
-        [HttpDelete("rooms")]
+        [HttpDelete("rooms/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> DeleteRoom(Guid id)
         {
-            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/room/{id}".DeleteAsync();
+            IFlurlResponse response = await $"{ Constants.LocationApiUrl }/api/rooms/{id}".DeleteAsync();
             var roomResponse = response.GetResponse("De meegegeven ruimte bestaat niet");
 
             if (roomResponse.StatusCode != HttpStatusCode.NoContent) // Service returns 204 on delete.
@@ -407,7 +395,7 @@ namespace api_gateway.Controllers
         #region Helper methods.
         private async Task<ObjectResult> CityExists(string id)
         {
-            IFlurlResponse flurlCityResponse = await $"{ Constants.LocationApiUrl }/api/City/{id}".GetAsync();
+            IFlurlResponse flurlCityResponse = await $"{ Constants.LocationApiUrl }/api/cities/{id}".GetAsync();
             var cityResponse = flurlCityResponse.GetResponse("De meegegeven stad bestaat niet");
 
             if (cityResponse.StatusCode != HttpStatusCode.OK)
@@ -420,7 +408,7 @@ namespace api_gateway.Controllers
 
         private async Task<ObjectResult> BuildingExists(string id)
         {
-            IFlurlResponse flurlBuildingResponse = await $"{ Constants.LocationApiUrl }/api/Building/{id}".GetAsync();
+            IFlurlResponse flurlBuildingResponse = await $"{ Constants.LocationApiUrl }/api/buildings/{id}".GetAsync();
             var buildingResponse = flurlBuildingResponse.GetResponse("Het meegegeven gebouw bestaat niet");
 
             if (buildingResponse.StatusCode != HttpStatusCode.OK)
