@@ -9,14 +9,12 @@ namespace api_gateway.Models.ServiceModels
     public class TicketServiceModel
     {
         public Guid Id { get; set; }
-        public string ToDoLocationId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string CreatedByPCN { get; set; }
+        public Guid LocationId { get; set; }
         public double FinishedAt { get; set; }
-        public string FinishedByPCN { get; set; }
-        public bool IsFinished { get; set; }
-        public string NextTicketId { get; set; }
-        public TicketAction TicketAction { get; set; }
+        public string CompletedByPersonId { get; set; }
+        public string ReceivedByPersonId { get; set; }
+
+        public Guid PackageId { get; set; }
 
     }
 }

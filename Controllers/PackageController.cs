@@ -104,25 +104,25 @@ namespace api_gateway.Controllers
             }
             PackageServiceModel packageModel = await packageResponse.GetJsonAsync<PackageServiceModel>();
 
-            IFlurlResponse personResponse = await $"{ Constants.PersonApiUrl }/api/persons/{packageModel.ReceiverId}".GetAsync();
-            var errPersonResponse = personResponse.GetResponse();
-            PersonServiceModel personModel = null;
-
-            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
-            {
-                personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
-            }
-
-            IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/room/{packageModel.CollectionPointId}".GetAsync();
+            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/room".GetAsync();
             var errLocationResponse = locationResponse.GetResponse();
-            Room room = null;
+            ICollection<Room> allRooms = null;
 
             if (errLocationResponse.StatusCode == HttpStatusCode.OK)
             {
-                room = await locationResponse.GetJsonAsync<Room>();
+                allRooms = await locationResponse.GetJsonAsync<ICollection<Room>>();
             }
 
-            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, personModel, room);
+            IFlurlResponse personResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
+            var errPersonResponse = personResponse.GetResponse();
+            ICollection<PersonServiceModel> allPersonServiceModels = null;
+
+            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
+            {
+                allPersonServiceModels = await personResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
+            }
+
+            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, allPersonServiceModels, allRooms);
             return Ok(responseModel);
 
         }
@@ -245,6 +245,38 @@ namespace api_gateway.Controllers
             {
                 return Ok();
             }
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<TicketResponseModel>> PostTicket(TicketRequestModel request)
+        {
+            ObjectResult personResponse = await PersonExists(request.CompletedByPersonId);
+            if (personResponse.StatusCode != 200)
+            {
+                return personResponse;
+            }
+
+            ObjectResult collectionPointResponse = await CollectionPointExists(request.LocationId);
+            if (collectionPointResponse.StatusCode != 200)
+            {
+                return collectionPointResponse;
+            }
+
+            //Post ticket
+            IFlurlResponse flurlPostResponse = await $"{ Constants.PackageApiUrl }/api/tickets".PostJsonAsync(request);
+            var postResponse = flurlPostResponse.GetResponse();
+
+            if (postResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(postResponse.Message) { StatusCode = (int)postResponse.StatusCode };
+            }
+
+            TicketServiceModel model = await flurlPostResponse.GetJsonAsync<TicketServiceModel>();
+            TicketResponseModel responseModel = ServiceToResponseModelConverter.ConvertTicket(model);
+            return CreatedAtAction("PostTickets", responseModel);
         }
 
         private async Task<ObjectResult> PersonExists(string id)

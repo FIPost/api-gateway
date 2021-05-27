@@ -18,28 +18,50 @@ namespace api_gateway.Models.Converters
             return new PackageResponseModel(
                 serviceModel.Id,
                 serviceModel.Sender,
-                serviceModel.TrackAndTraceId,
                 null,
                 null,
                 serviceModel.Name,
                 serviceModel.Status,
                 serviceModel.RouteFinished,
-                ConvertTickets(serviceModel.Tickets)
+                null
                 );
         }
 
-        public static PackageResponseModel ConvertPackage(PackageServiceModel serviceModel, PersonServiceModel personServiceModel, Room room)
+        public static PackageResponseModel ConvertPackage(PackageServiceModel serviceModel, ICollection<PersonServiceModel> personServiceModels, ICollection<Room> rooms)
         {
+            PersonServiceModel receiver = null;
+            Room collectionPoint = null;
+            if (personServiceModels != null)
+            {
+                receiver = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.ReceiverId);
+            }
+            if (rooms != null)
+            {
+                collectionPoint = rooms.FirstOrDefault(r => r.Id == serviceModel.CollectionPointId);
+            }
+
             return new PackageResponseModel(
                 serviceModel.Id,
                 serviceModel.Sender,
-                serviceModel.TrackAndTraceId,
-                room,
-                personServiceModel,
+                collectionPoint,
+                receiver,
                 serviceModel.Name,
                 serviceModel.Status,
                 serviceModel.RouteFinished,
-                ConvertTickets(serviceModel.Tickets)
+                ConvertTickets(serviceModel.Tickets, personServiceModels, rooms)
+                );
+        }
+
+        public static TicketResponseModel ConvertTicket(TicketServiceModel serviceModel, PersonServiceModel completedBy,
+            Room location, PersonServiceModel receivedBy = null)
+        {
+            return new TicketResponseModel(
+                serviceModel.Id,
+                location,
+                serviceModel.FinishedAt,
+                completedBy,
+                receivedBy,
+                serviceModel.PackageId
                 );
         }
 
@@ -47,30 +69,41 @@ namespace api_gateway.Models.Converters
         {
             return new TicketResponseModel(
                 serviceModel.Id,
-                serviceModel.ToDoLocationId,
-                serviceModel.CreatedAt,
-                serviceModel.CreatedByPCN,
+                null,
                 serviceModel.FinishedAt,
-                serviceModel.FinishedByPCN,
-                serviceModel.IsFinished,
-                serviceModel.NextTicketId,
-                serviceModel.TicketAction
+                null,
+                null,
+                serviceModel.PackageId
                 );
         }
 
-        public static ICollection<TicketResponseModel> ConvertTickets(ICollection<TicketServiceModel> serviceModels)
+        public static ICollection<TicketResponseModel> ConvertTickets(ICollection<TicketServiceModel> serviceModels, ICollection<PersonServiceModel> personServiceModels, 
+            ICollection<Room> rooms)
         {
             List<TicketResponseModel> responseModels = new List<TicketResponseModel>();
 
             // if the list is null assume empty and return an empty response model list
             if(serviceModels == null)
             {
-                return new List<TicketResponseModel>();
+                return responseModels;
             }
 
+            PersonServiceModel completedBy = null;
+            PersonServiceModel receivedBy = null;
+            Room location = null;
             foreach(var serviceModel in serviceModels)
             {
-                TicketResponseModel responseModel = ConvertTicket(serviceModel);
+                if (personServiceModels != null)
+                {
+                    completedBy = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.CompletedByPersonId);
+                    receivedBy = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.ReceivedByPersonId);
+                }
+                if (rooms != null)
+                {
+                    location = rooms.FirstOrDefault(r => r.Id == serviceModel.LocationId);
+                }
+
+                TicketResponseModel responseModel = ConvertTicket(serviceModel, completedBy, location, receivedBy);
                 responseModels.Add(responseModel);
             }
 
@@ -84,17 +117,7 @@ namespace api_gateway.Models.Converters
 
             foreach(var serviceModel in packageServiceModels)
             {
-                PersonServiceModel personServiceModel = null;
-                Room room = null;
-                if (personServiceModels != null)
-                {
-                    personServiceModel = personServiceModels.FirstOrDefault(p => p.Id == serviceModel.ReceiverId);
-                }
-                if (rooms != null)
-                {
-                    room = rooms.FirstOrDefault(r => r.Id.ToString() == serviceModel.CollectionPointId);
-                }
-                PackageResponseModel responseModel = ConvertPackage(serviceModel, personServiceModel, room);
+                PackageResponseModel responseModel = ConvertPackage(serviceModel, personServiceModels, rooms);
                 responseModels.Add(responseModel);
             }
             return responseModels;

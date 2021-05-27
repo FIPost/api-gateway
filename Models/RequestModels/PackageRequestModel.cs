@@ -11,5 +11,7 @@ namespace api_gateway.Models.RequestModels
         public string ReceiverId { get; set; }
         public string Name { get; set; }
         public Guid CollectionPointId { get; set; }
+        public string CreatedByPersonId { get; set; }
+        public Guid CreatedAtLocationId { get; set; }
     }
 }
