@@ -42,7 +42,7 @@ namespace api_gateway.Controllers
                 return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
             }
 
-            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/room".GetAsync();
+            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/rooms".GetAsync();
             var errLocationResponse = locationResponse.GetResponse();
             ICollection<Room> allRooms = null;
 
@@ -93,7 +93,7 @@ namespace api_gateway.Controllers
                 personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
             }
 
-            IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/room/{packageModel.CollectionPointId}".GetAsync();
+            IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/rooms/{packageModel.CollectionPointId}".GetAsync();
             var errLocationResponse = locationResponse.GetResponse();
             Room room = null;
 
