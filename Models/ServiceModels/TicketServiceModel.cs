@@ -14,7 +14,5 @@ namespace api_gateway.Models.ServiceModels
         public string CompletedByPersonId { get; set; }
         public string ReceivedByPersonId { get; set; }
 
-        public Guid PackageId { get; set; }
-
     }
 }

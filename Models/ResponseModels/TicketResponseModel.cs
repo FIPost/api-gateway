@@ -11,20 +11,18 @@ namespace api_gateway.Models.ResponseModels
     public class TicketResponseModel
     {
         public Guid Id { get; set; }
-        public Room Location { get; set; }
+        public string Location { get; set; }
         public double FinishedAt { get; set; }
-        public PersonServiceModel CompletedByPerson { get; set; }
-        public PersonServiceModel ReceivedByPerson { get; set; }
-        public Guid PackageId { get; set; }
+        public string CompletedByPerson { get; set; }
+        public string ReceivedByPerson { get; set; }
 
-        public TicketResponseModel(Guid id, Room location, double finishedAt, PersonServiceModel completedBy, PersonServiceModel receivedBy, Guid packageId)
+        public TicketResponseModel(Guid id, string location, double finishedAt, string completedBy, string receivedBy)
         {
             Id = id;
             Location = location;
             FinishedAt = finishedAt;
             CompletedByPerson = completedBy;
             ReceivedByPerson = receivedBy;
-            PackageId = packageId;
         }
 
         public TicketResponseModel()

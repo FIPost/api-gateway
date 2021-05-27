@@ -247,7 +247,7 @@ namespace api_gateway.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpPost("tickets")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -276,7 +276,7 @@ namespace api_gateway.Controllers
 
             TicketServiceModel model = await flurlPostResponse.GetJsonAsync<TicketServiceModel>();
             TicketResponseModel responseModel = ServiceToResponseModelConverter.ConvertTicket(model);
-            return CreatedAtAction("PostTickets", responseModel);
+            return CreatedAtAction("PostTicket", responseModel);
         }
 
         private async Task<ObjectResult> PersonExists(string id)

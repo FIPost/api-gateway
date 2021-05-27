@@ -57,11 +57,10 @@ namespace api_gateway.Models.Converters
         {
             return new TicketResponseModel(
                 serviceModel.Id,
-                location,
+                location != null ? location.Building.Address.City.Name + ", " + location.Building.Name + ", " + location.Name : "",
                 serviceModel.FinishedAt,
-                completedBy,
-                receivedBy,
-                serviceModel.PackageId
+                completedBy != null ? completedBy.Name : "",
+                receivedBy != null ? receivedBy.Name : ""
                 );
         }
 
@@ -72,8 +71,7 @@ namespace api_gateway.Models.Converters
                 null,
                 serviceModel.FinishedAt,
                 null,
-                null,
-                serviceModel.PackageId
+                null
                 );
         }
 
