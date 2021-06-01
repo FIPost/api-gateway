@@ -57,7 +57,7 @@ namespace api_gateway.Models.Converters
         {
             return new TicketResponseModel(
                 serviceModel.Id,
-                location != null ? location.Building.Address.City.Name + ", " + location.Building.Name + ", " + location.Name : "",
+                location,
                 serviceModel.FinishedAt,
                 completedBy != null ? completedBy.Name : "",
                 receivedBy != null ? receivedBy.Name : ""
