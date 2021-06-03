@@ -10,8 +10,7 @@ namespace api_gateway.Models.ServiceModels
     {
         public Guid Id { get; set; }
         public string ReceiverId { get; set; }
-        public string TrackAndTraceId { get; set; }
-        public string CollectionPointId { get; set; }
+        public Guid CollectionPointId { get; set; }
         public string Sender { get; set; }
         public string Name { get; set; }
         public Status Status { get; set; }

@@ -42,26 +42,8 @@ namespace api_gateway.Controllers
                 return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
             }
 
-            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/rooms".GetAsync();
-            var errLocationResponse = locationResponse.GetResponse();
-            ICollection<Room> allRooms = null;
-
-            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
-            {
-                allRooms = await locationResponse.GetJsonAsync<ICollection<Room>>();
-            }
-
-            IFlurlResponse personResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
-            var errPersonResponse = personResponse.GetResponse();
-            ICollection<PersonServiceModel> allPersonServiceModels = null;
-
-            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
-            {
-                allPersonServiceModels = await personResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
-            }
-
             ICollection<PackageServiceModel> allPackageServiceModels = await packageResponse.GetJsonAsync<ICollection<PackageServiceModel>>();
-            ICollection<PackageResponseModel> allPackages = ServiceToResponseModelConverter.ConvertPackages(allPackageServiceModels, allPersonServiceModels, allRooms);
+            ICollection<PackageResponseModel> allPackages = ServiceToResponseModelConverter.ConvertPackages(allPackageServiceModels, await GetAllPersons(), await GetAllRooms());
 
             return Ok(allPackages);
 
@@ -84,25 +66,8 @@ namespace api_gateway.Controllers
             }
             PackageServiceModel packageModel = await packageResponse.GetJsonAsync<PackageServiceModel>();
 
-            IFlurlResponse personResponse = await $"{ Constants.PersonApiUrl }/api/persons/{packageModel.ReceiverId}".GetAsync();
-            var errPersonResponse = personResponse.GetResponse();
-            PersonServiceModel personModel = null;
 
-            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
-            {
-                personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
-            }
-
-            IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/rooms/{packageModel.CollectionPointId}".GetAsync();
-            var errLocationResponse = locationResponse.GetResponse();
-            Room room = null;
-
-            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
-            {
-                room = await locationResponse.GetJsonAsync<Room>();
-            }
-
-            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, personModel, room);
+            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, await GetAllPersons(), await GetAllRooms());
             return Ok(responseModel);
 
         }
@@ -139,6 +104,38 @@ namespace api_gateway.Controllers
             PackageServiceModel model = await flurlPostResponse.GetJsonAsync<PackageServiceModel>();
             PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(model);
             return CreatedAtAction("PostPackage", responseModel);
+        }
+
+        [HttpPost("tickets")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<TicketResponseModel>> PostTicket(TicketRequestModel request)
+        {
+            ObjectResult personResponse = await PersonExists(request.CompletedByPersonId);
+            if (personResponse.StatusCode != 200)
+            {
+                return personResponse;
+            }
+
+            ObjectResult collectionPointResponse = await CollectionPointExists(request.LocationId);
+            if (collectionPointResponse.StatusCode != 200)
+            {
+                return collectionPointResponse;
+            }
+
+            //Post ticket
+            IFlurlResponse flurlPostResponse = await $"{ Constants.PackageApiUrl }/api/tickets".PostJsonAsync(request);
+            var postResponse = flurlPostResponse.GetResponse();
+
+            if (postResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(postResponse.Message) { StatusCode = (int)postResponse.StatusCode };
+            }
+
+            TicketServiceModel model = await flurlPostResponse.GetJsonAsync<TicketServiceModel>();
+            TicketResponseModel responseModel = ServiceToResponseModelConverter.ConvertTicket(model);
+            return CreatedAtAction("PostTicket", responseModel);
         }
 
         // PUT api/packages/5
@@ -220,6 +217,33 @@ namespace api_gateway.Controllers
             }
 
             return new ObjectResult(collectionPointResponse.Message) { StatusCode = (int)collectionPointResponse.StatusCode };
+        }
+
+        private async Task<ICollection<Room>> GetAllRooms()
+        {
+            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/rooms".GetAsync();
+            var errLocationResponse = locationResponse.GetResponse();
+            ICollection<Room> allRooms = null;
+
+            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
+            {
+                allRooms = await locationResponse.GetJsonAsync<ICollection<Room>>();
+            }
+            return allRooms;
+        }
+
+        private async Task<ICollection<PersonServiceModel>> GetAllPersons()
+        {
+            IFlurlResponse personResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
+            var errPersonResponse = personResponse.GetResponse();
+            ICollection<PersonServiceModel> allPersonServiceModels = null;
+
+            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
+            {
+                allPersonServiceModels = await personResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
+            }
+
+            return allPersonServiceModels;
         }
         #endregion
     }
