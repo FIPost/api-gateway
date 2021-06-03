@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using api_gateway.Models.ResponseModels;
 using api_gateway.Models.ServiceModels;
@@ -10,7 +9,6 @@ using api_gateway.Models.Converters;
 using api_gateway.Models.RequestModels;
 using Microsoft.AspNetCore.Http;
 using api_gateway.Helper;
-using Newtonsoft.Json;
 using System.Net;
 using api_gateway.Models.ServiceModels.Location;
 
@@ -18,8 +16,6 @@ using api_gateway.Models.ServiceModels.Location;
 
 namespace api_gateway.Controllers
 {
-    /// TODO: error handling, HTTP code responses for created, not found, failed etc.
-    /// 
     /// <summary>
     /// The package controller handles all of the web-friendly endpoints that consume the package resource.
     /// Controller documentation should be handled automatically via swagger.
@@ -31,13 +27,7 @@ namespace api_gateway.Controllers
     public class PackageController : ControllerBase
     {
 
-        /// <summary>
-        /// Gets a list of all the available packages from the package service
-        /// </summary>
-        /// <returns>List of packages</returns>
-        /// <response code="200">returns the list of packages</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
+        #region Get methods.
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,41 +42,13 @@ namespace api_gateway.Controllers
                 return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
             }
 
-            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/room".GetAsync();
-            var errLocationResponse = locationResponse.GetResponse();
-            ICollection<Room> allRooms = null;
-
-            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
-            {
-                allRooms = await locationResponse.GetJsonAsync<ICollection<Room>>();
-            }
-
-            IFlurlResponse personResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
-            var errPersonResponse = personResponse.GetResponse();
-            ICollection<PersonServiceModel> allPersonServiceModels = null;
-
-            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
-            {
-                allPersonServiceModels = await personResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
-            }
-
             ICollection<PackageServiceModel> allPackageServiceModels = await packageResponse.GetJsonAsync<ICollection<PackageServiceModel>>();
-            ICollection<PackageResponseModel> allPackages = ServiceToResponseModelConverter.ConvertPackages(allPackageServiceModels, allPersonServiceModels, allRooms);
+            ICollection<PackageResponseModel> allPackages = ServiceToResponseModelConverter.ConvertPackages(allPackageServiceModels, await GetAllPersons(), await GetAllRooms());
 
             return Ok(allPackages);
 
         }
 
-
-        /// <summary>
-        /// Gets a specific package by id
-        /// </summary>
-        /// <param name="id">the id of the package</param>
-        /// <returns>package with matching id</returns>
-        /// <response code="200">Returns the package with the specified id</response>
-        /// <response code="404">No package found with the matching id</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -104,44 +66,21 @@ namespace api_gateway.Controllers
             }
             PackageServiceModel packageModel = await packageResponse.GetJsonAsync<PackageServiceModel>();
 
-            IFlurlResponse personResponse = await $"{ Constants.PersonApiUrl }/api/persons/{packageModel.ReceiverId}".GetAsync();
-            var errPersonResponse = personResponse.GetResponse();
-            PersonServiceModel personModel = null;
 
-            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
-            {
-                personModel = await personResponse.GetJsonAsync<PersonServiceModel>();
-            }
-
-            IFlurlResponse locationResponse = await $"{ Constants.LocationApiUrl }/api/room/{packageModel.CollectionPointId}".GetAsync();
-            var errLocationResponse = locationResponse.GetResponse();
-            Room room = null;
-
-            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
-            {
-                room = await locationResponse.GetJsonAsync<Room>();
-            }
-
-            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, personModel, room);
+            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(packageModel, await GetAllPersons(), await GetAllRooms());
             return Ok(responseModel);
 
         }
+        #endregion
 
-        /// <summary>
-        /// Creates a new package
-        /// </summary>
-        /// <param name="request">Package request model</param>
-        /// <returns>the newly created package</returns>
-        /// <response code="201">A new package has been created</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
+        #region Post methods.
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<PackageResponseModel>> Post(PackageRequestModel request)
+        public async Task<ActionResult<PackageResponseModel>> PostPackage(PackageRequestModel request)
         {
-            ObjectResult personResponse = await PersonExists(request.ReceiverId); 
+            ObjectResult personResponse = await PersonExists(request.ReceiverId);
             if (personResponse.StatusCode != 200)
             {
                 return personResponse;
@@ -164,26 +103,48 @@ namespace api_gateway.Controllers
 
             PackageServiceModel model = await flurlPostResponse.GetJsonAsync<PackageServiceModel>();
             PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(model);
-            return CreatedAtAction("Post", responseModel);
+            return CreatedAtAction("PostPackage", responseModel);
         }
 
-        /// <summary>
-        /// Update a package with a specified id
-        /// </summary>
-        /// <param name="id">the id of the package to be updated</param>
-        /// <param name="request">the data that the package should be updated with</param>
-        /// <returns>Status code of update request</returns>
-        /// <response code="204">The update is successful (no content)</response>
-        /// <response code="404">No package found with the matching id</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
+        [HttpPost("tickets")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<TicketResponseModel>> PostTicket(TicketRequestModel request)
+        {
+            ObjectResult personResponse = await PersonExists(request.CompletedByPersonId);
+            if (personResponse.StatusCode != 200)
+            {
+                return personResponse;
+            }
+
+            ObjectResult collectionPointResponse = await CollectionPointExists(request.LocationId);
+            if (collectionPointResponse.StatusCode != 200)
+            {
+                return collectionPointResponse;
+            }
+
+            //Post ticket
+            IFlurlResponse flurlPostResponse = await $"{ Constants.PackageApiUrl }/api/tickets".PostJsonAsync(request);
+            var postResponse = flurlPostResponse.GetResponse();
+
+            if (postResponse.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(postResponse.Message) { StatusCode = (int)postResponse.StatusCode };
+            }
+
+            TicketServiceModel model = await flurlPostResponse.GetJsonAsync<TicketServiceModel>();
+            TicketResponseModel responseModel = ServiceToResponseModelConverter.ConvertTicket(model);
+            return CreatedAtAction("PostTicket", responseModel);
+        }
+
         // PUT api/packages/5
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Put(Guid id, PackageRequestModel request)
+        public async Task<ActionResult<PackageResponseModel>> PutPackage(Guid id, PackageRequestModel request)
         {
             ObjectResult personResponse = await PersonExists(request.ReceiverId);
             if (personResponse.StatusCode != 200)
@@ -207,46 +168,31 @@ namespace api_gateway.Controllers
 
             PackageServiceModel model = await flurlPutResponse.GetJsonAsync<PackageServiceModel>();
             PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(model);
-            return StatusCode(204);
+            return CreatedAtAction("PutPackage", responseModel);
         }
+        #endregion
 
-        /// <summary>
-        /// deletes a package with a specific id
-        /// </summary>
-        /// <param name="id">the id of the package to be deleted</param>
-        /// <returns>Status code of delete request</returns>
-        /// <response code="200">The package is successfully deleted</response>
-        /// <response code="404">No package found with the matching id</response>
-        /// <response code="400">bad request, something went wrong on the client-side</response>
-        /// <response code="500">processing error, something went wrong on the server-side</response>
+        #region Delete methods.
         // DELETE api/packages/5
         [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult> Delete(Guid id)
         {
             IFlurlResponse response = await $"{ Constants.PackageApiUrl }/api/packages/{id}".DeleteAsync();
+            var deleteResponse = response.GetResponse("Het meegegeven pakket bestaat niet");
 
-            if (response.StatusCode == 404)
+            if (deleteResponse.StatusCode != HttpStatusCode.NoContent) // Service returns 204 on delete.
             {
-                return NotFound();
+                return new ObjectResult(deleteResponse.Message) { StatusCode = (int)deleteResponse.StatusCode };
             }
-            else if (response.StatusCode >= 400)
-            {
-                return StatusCode(400);
-            }
-            else if (response.StatusCode >= 500)
-            {
-                return StatusCode(500);
-            }
-            else
-            {
-                return Ok();
-            }
+
+            return new ObjectResult(deleteResponse.Message) { StatusCode = (int)deleteResponse.StatusCode };
         }
+        #endregion
 
+        #region Helper methods.
         private async Task<ObjectResult> PersonExists(string id)
         {
             IFlurlResponse flurlPersonResponse = await $"{ Constants.PersonApiUrl }/api/persons/{id}".GetAsync();
@@ -262,7 +208,7 @@ namespace api_gateway.Controllers
 
         private async Task<ObjectResult> CollectionPointExists(Guid id)
         {
-            IFlurlResponse flurlCollectionPointResponse = await $"{ Constants.LocationApiUrl }/api/Room/{id}".GetAsync();
+            IFlurlResponse flurlCollectionPointResponse = await $"{ Constants.LocationApiUrl }/api/rooms/{id}".GetAsync();
             var collectionPointResponse = flurlCollectionPointResponse.GetResponse("De meegegeven ruimte bestaat niet");
 
             if (collectionPointResponse.StatusCode != HttpStatusCode.OK)
@@ -272,5 +218,33 @@ namespace api_gateway.Controllers
 
             return new ObjectResult(collectionPointResponse.Message) { StatusCode = (int)collectionPointResponse.StatusCode };
         }
+
+        private async Task<ICollection<Room>> GetAllRooms()
+        {
+            IFlurlResponse locationResponse = await $"{Constants.LocationApiUrl}/api/rooms".GetAsync();
+            var errLocationResponse = locationResponse.GetResponse();
+            ICollection<Room> allRooms = null;
+
+            if (errLocationResponse.StatusCode == HttpStatusCode.OK)
+            {
+                allRooms = await locationResponse.GetJsonAsync<ICollection<Room>>();
+            }
+            return allRooms;
+        }
+
+        private async Task<ICollection<PersonServiceModel>> GetAllPersons()
+        {
+            IFlurlResponse personResponse = await $"{Constants.PersonApiUrl}/api/persons".GetAsync();
+            var errPersonResponse = personResponse.GetResponse();
+            ICollection<PersonServiceModel> allPersonServiceModels = null;
+
+            if (errPersonResponse.StatusCode == HttpStatusCode.OK)
+            {
+                allPersonServiceModels = await personResponse.GetJsonAsync<ICollection<PersonServiceModel>>();
+            }
+
+            return allPersonServiceModels;
+        }
+        #endregion
     }
 }
