@@ -156,7 +156,9 @@ namespace api_gateway.Controllers
 
             return CreatedAtAction("PostTicket", responseModel);
         }
+        #endregion
 
+        #region Put methods.
         // PUT api/packages/5
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
