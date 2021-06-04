@@ -102,7 +102,11 @@ namespace api_gateway.Controllers
             }
 
             PackageServiceModel model = await flurlPostResponse.GetJsonAsync<PackageServiceModel>();
-            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(model);
+            PackageResponseModel responseModel = ServiceToResponseModelConverter.ConvertPackage(model, await GetAllPersons(), await GetAllRooms());
+
+            //send registration mail
+            await "https://mailservice20210603092014.azurewebsites.net/api/TrackAndTraceMail?code=bTMCXQQGWaQycYLfbP/Vq749V03PPkSbmwRyfQlBXlVQq9WZyR4U7Q==".PostJsonAsync(responseModel);
+
             return CreatedAtAction("PostPackage", responseModel);
         }
 
@@ -135,6 +139,21 @@ namespace api_gateway.Controllers
 
             TicketServiceModel model = await flurlPostResponse.GetJsonAsync<TicketServiceModel>();
             TicketResponseModel responseModel = ServiceToResponseModelConverter.ConvertTicket(model);
+
+            //check if package is finished and then send arrival email
+            IFlurlResponse flurlPackageResponse = await $"{ Constants.PackageApiUrl}/api/packages/{request.PackageId}".GetAsync();
+
+            PackageServiceModel pkgService = await flurlPackageResponse.GetJsonAsync<PackageServiceModel>();
+            PackageResponseModel pkg = ServiceToResponseModelConverter.ConvertPackage(pkgService, await GetAllPersons(), await GetAllRooms());
+
+            Console.WriteLine("package route finished is " + pkg.RouteFinished);
+
+            if (pkg.RouteFinished)
+            {
+                //send email
+                await "https://mailservice20210603092014.azurewebsites.net/api/ArrivalMail?code=gYOUs9FO7WwwNXz2eSGtZM0AFxQl/RQvOJ4RF0uotwYLe7l/AIGGKg==".PostJsonAsync(pkg);
+            }
+
             return CreatedAtAction("PostTicket", responseModel);
         }
 
