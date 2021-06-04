@@ -141,8 +141,12 @@ namespace api_gateway.Controllers
             TicketResponseModel responseModel = ServiceToResponseModelConverter.ConvertTicket(model);
 
             //check if package is finished and then send arrival email
-            ActionResult<PackageResponseModel> pkgresult = await GetById(request.PackageId);
-            PackageResponseModel pkg = pkgresult.Value;
+            IFlurlResponse flurlPackageResponse = await $"{ Constants.PackageApiUrl}/api/packages/{request.PackageId}".GetAsync();
+
+            PackageServiceModel pkgService = await flurlPackageResponse.GetJsonAsync<PackageServiceModel>();
+            PackageResponseModel pkg = ServiceToResponseModelConverter.ConvertPackage(pkgService);
+
+            Console.WriteLine("package route finished is " + pkg.RouteFinished);
 
             if (pkg.RouteFinished)
             {
