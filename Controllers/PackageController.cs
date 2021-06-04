@@ -144,7 +144,7 @@ namespace api_gateway.Controllers
             IFlurlResponse flurlPackageResponse = await $"{ Constants.PackageApiUrl}/api/packages/{request.PackageId}".GetAsync();
 
             PackageServiceModel pkgService = await flurlPackageResponse.GetJsonAsync<PackageServiceModel>();
-            PackageResponseModel pkg = ServiceToResponseModelConverter.ConvertPackage(pkgService);
+            PackageResponseModel pkg = ServiceToResponseModelConverter.ConvertPackage(pkgService, await GetAllPersons(), await GetAllRooms());
 
             Console.WriteLine("package route finished is " + pkg.RouteFinished);
 
