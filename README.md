@@ -48,7 +48,7 @@ docker network create ipost-network
 ```
 
 ### Custom Docker Build
-Create a new appsettings file (i.e. appsettings.example_env.json) and set all the necessesery values as used in the other appsettings files.
+Create a new appsettings file (i.e. `appsettings.example_env.json)` and set all the necessesery values as used in the other appsettings files.
 
 Then build the docker image with the environment value so that it uses the right appsettings.
 
