@@ -35,11 +35,11 @@ namespace api_gateway.Controllers
         public async Task<ActionResult<ICollection<PackageResponseModel>>> Get()
         {
             IFlurlResponse packageResponse = await $"{Constants.PackageApiUrl}/api/packages".GetAsync();
-            var errPackageResponse = packageResponse.GetResponse("Er zijn nog geen pakketten");
-
-            if (errPackageResponse.StatusCode != HttpStatusCode.OK)
+            //var errPackageResponse = packageResponse.GetResponse("Er zijn nog geen pakketten");
+            if (packageResponse.StatusCode != 200)
             {
-                return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
+                Task<string> result = packageResponse.GetStringAsync();
+                return new ObjectResult(result.Result) { StatusCode = packageResponse.StatusCode };
             }
 
             ICollection<PackageServiceModel> allPackageServiceModels = await packageResponse.GetJsonAsync<ICollection<PackageServiceModel>>();

@@ -325,11 +325,11 @@ namespace api_gateway.Controllers
 
             //put room
             IFlurlResponse flurlResponse = await $"{ Constants.LocationApiUrl }/api/rooms/{id}".PutJsonAsync(request);
-            var response = flurlResponse.GetResponse();
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            //var response = flurlResponse.GetResponse();
+            if (flurlResponse.StatusCode != 200)
             {
-                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
+                Task<string> result = flurlResponse.GetStringAsync();
+                return new ObjectResult(result.Result) { StatusCode = flurlResponse.StatusCode };
             }
 
             Room responseModel = await flurlResponse.GetJsonAsync<Room>();
