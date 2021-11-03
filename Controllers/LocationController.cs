@@ -78,6 +78,25 @@ namespace api_gateway.Controllers
             return Ok(responseModels);
         }
 
+        [HttpGet("buildings/city/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ICollection<Building>>> GetAllBuildingsByCity(Guid id)
+        {
+            IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/buildings/city/{id}".GetAsync();
+            var response = flurlResponse.GetResponse("Dit gebouw kan niet gevonden worden");
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                return new ObjectResult(response.Message) { StatusCode = (int)response.StatusCode };
+            }
+
+            ICollection<Building> responseModels = await flurlResponse.GetJsonAsync<ICollection<Building>>();
+            return Ok(responseModels);
+        }
+
         [HttpGet("rooms/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
