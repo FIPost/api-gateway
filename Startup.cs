@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using api_gateway.Controllers;
 using api_gateway.Helper;
 using Flurl.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,12 +17,17 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace api_gateway
 {
     public class Startup
     {
         readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+        private const string SECRET_KEY = "this is my custom Secret key for authnetication";
+        public static readonly SymmetricSecurityKey SIGNING_KEY = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SECRET_KEY));
 
         public Startup(IConfiguration configuration)
         {
@@ -30,6 +39,7 @@ namespace api_gateway
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+           
             services.Configure<KestrelServerOptions>(
             Configuration.GetSection("Kestrel"));
 
@@ -55,6 +65,24 @@ namespace api_gateway
                           .AllowAnyOrigin();
                       });
             });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "JwtBearer";
+                options.DefaultChallengeScheme = "JwtBearer";
+            })
+             .AddJwtBearer("JwtBearer", jwtOptions =>
+             {
+                 jwtOptions.TokenValidationParameters = new TokenValidationParameters()
+                 {
+                     IssuerSigningKey = SIGNING_KEY,
+                     ValidateIssuer = false,
+                     ValidateAudience = false,
+                     ValidateIssuerSigningKey = false,
+                     ValidateLifetime = true,
+                     ClockSkew = TimeSpan.FromMinutes(5)
+                 };
+             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,11 +99,20 @@ namespace api_gateway
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                /*
+                if (env.IsDevelopment())
+                {
+                    endpoints.MapControllers().WithMetadata(new AllowAnonymousAttribute());
+                }
+                else
+                {*/
+                    endpoints.MapControllers();
+                //}
             });
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.

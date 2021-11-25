@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using api_gateway.Helper;
 using System.Net;
 using api_gateway.Models.ServiceModels.Location;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,6 +25,9 @@ namespace api_gateway.Controllers
     [Produces("application/json")]
     [Route("api/packages")]
     [ApiController]
+    [Authorize]
+
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class PackageController : ControllerBase
     {
 

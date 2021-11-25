@@ -1,6 +1,7 @@
 ﻿using api_gateway.Helper;
 using api_gateway.Models.ServiceModels;
 using Flurl.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,6 +15,8 @@ namespace api_gateway.Controllers
     [Produces("application/json")]
     [Route("api")]
     [ApiController]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class PersonController : ControllerBase
     {
         #region Get methods.

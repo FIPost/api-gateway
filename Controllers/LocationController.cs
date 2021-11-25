@@ -9,6 +9,8 @@ using api_gateway.Models.RequestModels.Location;
 using Microsoft.AspNetCore.Http;
 using api_gateway.Helper;
 using System.Net;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace api_gateway.Controllers
 {
@@ -20,9 +22,10 @@ namespace api_gateway.Controllers
     [Produces("application/json")]
     [Route("api/locations")]
     [ApiController]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class LocationController : ControllerBase
     {
-
         #region Get methods.
         [HttpGet("rooms")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -30,6 +33,7 @@ namespace api_gateway.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ICollection<Room>>> GetRooms()
         {
+            var user = User.Identity;
             IFlurlResponse flurlResponse = await $"{Constants.LocationApiUrl}/api/rooms".GetAsync();
             var response = flurlResponse.GetResponse("Er kunnen geen ruimtes gevonden worden");
 
