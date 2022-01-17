@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using api_gateway.Helper;
 using System.Net;
 using api_gateway.Models.ServiceModels.Location;
+using Microsoft.AspNetCore.Authorization;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -24,6 +25,9 @@ namespace api_gateway.Controllers
     [Produces("application/json")]
     [Route("api/packages")]
     [ApiController]
+    [Authorize]
+
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class PackageController : ControllerBase
     {
 
@@ -35,11 +39,11 @@ namespace api_gateway.Controllers
         public async Task<ActionResult<ICollection<PackageResponseModel>>> Get()
         {
             IFlurlResponse packageResponse = await $"{Constants.PackageApiUrl}/api/packages".GetAsync();
-            var errPackageResponse = packageResponse.GetResponse("Er zijn nog geen pakketten");
-
-            if (errPackageResponse.StatusCode != HttpStatusCode.OK)
+            //var errPackageResponse = packageResponse.GetResponse("Er zijn nog geen pakketten");
+            if (packageResponse.StatusCode != 200)
             {
-                return new ObjectResult(errPackageResponse.Message) { StatusCode = (int)errPackageResponse.StatusCode };
+                Task<string> result = packageResponse.GetStringAsync();
+                return new ObjectResult(result.Result) { StatusCode = packageResponse.StatusCode };
             }
 
             ICollection<PackageServiceModel> allPackageServiceModels = await packageResponse.GetJsonAsync<ICollection<PackageServiceModel>>();
